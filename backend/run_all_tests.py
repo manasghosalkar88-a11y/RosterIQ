@@ -19,6 +19,7 @@ TEST_SCRIPTS = [
     ("Phase 12: Analytics & Streaming CSV Exports", "test_analytics.py"),
     ("Phase 13: 3D Overview & Notifications", "test_overview_notifications.py"),
     ("Phase 14: Settings & Live Diagnostics", "test_settings.py"),
+    ("Phase 15: RosterIQ Impact Simulator", "test_simulator.py"),
 ]
 
 def run_suite():
@@ -53,7 +54,7 @@ def run_suite():
     print("\n" + "=" * 80)
     print(f"  SUMMARY: {passed_count}/{len(TEST_SCRIPTS)} TEST MODULES PASSED ({total_duration}s total)")
     if passed_count == len(TEST_SCRIPTS):
-        print("  VERIFICATION RESULT: ALL 12 PHASES PASSED WITH ZERO ERRORS (100% OPERATIONAL)")
+        print(f"  VERIFICATION RESULT: ALL {len(TEST_SCRIPTS)} ENTERPRISE MODULES PASSED WITH ZERO ERRORS (100% OPERATIONAL)")
     else:
         print("  VERIFICATION RESULT: SOME TESTS FAILED. PLEASE INSPECT LOGS.")
     print("=" * 80)

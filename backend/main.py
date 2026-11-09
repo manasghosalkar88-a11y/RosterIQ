@@ -54,7 +54,7 @@ def api_root():
     }
 
 
-from app.api.v1 import auth, employees, brands, processes, pods, seed, allocations, rules, leaves, holidays, roster, conflicts, changes, approvals, analytics, overview, notifications, settings as system_settings
+from app.api.v1 import auth, employees, brands, processes, pods, seed, allocations, rules, leaves, holidays, roster, conflicts, changes, approvals, analytics, overview, notifications, settings as system_settings, simulator
 
 # Mount API routers
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Authentication"])
@@ -73,5 +73,6 @@ app.include_router(approvals.router, prefix=f"{settings.API_V1_STR}", tags=["App
 app.include_router(analytics.router, prefix=f"{settings.API_V1_STR}", tags=["Analytics & Operational Reports"])
 app.include_router(overview.router, prefix=f"{settings.API_V1_STR}", tags=["Overview Dashboard"])
 app.include_router(notifications.router, prefix=f"{settings.API_V1_STR}", tags=["Notifications"])
+app.include_router(simulator.router, prefix=f"{settings.API_V1_STR}", tags=["RosterIQ Impact Simulator"])
 app.include_router(system_settings.router, prefix=f"{settings.API_V1_STR}", tags=["Settings & System Diagnostics"])
 app.include_router(seed.router, prefix=f"{settings.API_V1_STR}/seed", tags=["Seed & Demo"])

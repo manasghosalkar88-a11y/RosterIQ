@@ -9,7 +9,9 @@ import {
   Check,
   X,
   Sparkles,
+  FlaskConical,
 } from 'lucide-react';
+import { RosterImpactSimulator } from '../components/planner/RosterImpactSimulator';
 
 export const ConflictsAlertsPage: React.FC = () => {
   const [conflicts, setConflicts] = useState<Conflict[]>([]);
@@ -21,6 +23,19 @@ export const ConflictsAlertsPage: React.FC = () => {
   const [selectedConflict, setSelectedConflict] = useState<Conflict | null>(null);
   const [resolveNotes, setResolveNotes] = useState('');
   const [notification, setNotification] = useState<string | null>(null);
+
+  // Impact Simulator States
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
+  const [simulatorContext, setSimulatorContext] = useState<{
+    employeeId?: number;
+    employeeName?: string;
+    date?: string;
+    brandId?: number;
+    brandName?: string;
+    processId?: number;
+    conflictId?: number;
+  } | null>(null);
+  const [activeRosterId, setActiveRosterId] = useState<number>(1);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -279,13 +294,35 @@ export const ConflictsAlertsPage: React.FC = () => {
 
                 <div className="flex items-center space-x-2 flex-shrink-0">
                   {!c.is_resolved && (
-                    <button
-                      onClick={() => setSelectedConflict(c)}
-                      className="px-4 py-2 rounded-xl bg-app-sidebar hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-all flex items-center space-x-1.5"
-                    >
-                      <Check className="w-3.5 h-3.5 text-teal-400" />
-                      <span>Resolve Conflict</span>
-                    </button>
+                    <>
+                      <button
+                        onClick={() => {
+                          setActiveRosterId(c.roster_id || 1);
+                          setSimulatorContext({
+                            employeeId: c.employee_id || undefined,
+                            employeeName: c.employee_name || undefined,
+                            date: c.date,
+                            brandId: c.brand_id || undefined,
+                            brandName: c.brand_name || undefined,
+                            processId: c.process_id || undefined,
+                            conflictId: c.id,
+                          });
+                          setIsSimulatorOpen(true);
+                        }}
+                        className="px-3.5 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-xs font-bold shadow-xs transition-all flex items-center space-x-1.5"
+                      >
+                        <FlaskConical className="w-3.5 h-3.5 text-teal-600" />
+                        <span>Simulate Impact</span>
+                      </button>
+
+                      <button
+                        onClick={() => setSelectedConflict(c)}
+                        className="px-4 py-2 rounded-xl bg-app-sidebar hover:bg-slate-800 text-white text-xs font-semibold shadow-xs transition-all flex items-center space-x-1.5"
+                      >
+                        <Check className="w-3.5 h-3.5 text-teal-400" />
+                        <span>Resolve Conflict</span>
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
@@ -333,26 +370,62 @@ export const ConflictsAlertsPage: React.FC = () => {
                 />
               </div>
 
-              <div className="pt-3 border-t border-app-border flex justify-end space-x-2">
+              <div className="pt-3 border-t border-app-border flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={() => setSelectedConflict(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium"
+                  onClick={() => {
+                    if (!selectedConflict) return;
+                    setActiveRosterId(selectedConflict.roster_id || 1);
+                    setSimulatorContext({
+                      employeeId: selectedConflict.employee_id || undefined,
+                      employeeName: selectedConflict.employee_name || undefined,
+                      date: selectedConflict.date,
+                      brandId: selectedConflict.brand_id || undefined,
+                      brandName: selectedConflict.brand_name || undefined,
+                      processId: selectedConflict.process_id || undefined,
+                      conflictId: selectedConflict.id,
+                    });
+                    setSelectedConflict(null);
+                    setIsSimulatorOpen(true);
+                  }}
+                  className="px-3 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-xs font-bold flex items-center space-x-1.5"
                 >
-                  Cancel
+                  <FlaskConical className="w-3.5 h-3.5 text-teal-600" />
+                  <span>Simulate in Engine</span>
                 </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold flex items-center space-x-1.5"
-                >
-                  <Check className="w-4 h-4" />
-                  <span>Confirm Resolution</span>
-                </button>
+
+                <div className="flex space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedConflict(null)}
+                    className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold flex items-center space-x-1.5"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>Confirm Resolution</span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* RosterIQ Impact Simulator Drawer */}
+      <RosterImpactSimulator
+        isOpen={isSimulatorOpen}
+        onClose={() => setIsSimulatorOpen(false)}
+        rosterId={activeRosterId}
+        month={11}
+        year={2026}
+        onRosterUpdated={fetchData}
+        initialContext={simulatorContext}
+      />
     </div>
   );
 };

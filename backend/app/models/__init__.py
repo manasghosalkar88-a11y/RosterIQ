@@ -17,6 +17,7 @@ from app.models.roster import Roster, RosterEntry, RosterVersion, RosterStatus, 
 from app.models.conflict import SchedulingConflict, ConflictType, ConflictSeverity
 from app.models.audit import AuditLog
 from app.models.notification import Notification
+from app.models.simulation import SimulationScenario, SimulationType, ScenarioStatus
 
 __all__ = [
     "Base",
@@ -47,4 +48,7 @@ __all__ = [
     "ConflictSeverity",
     "AuditLog",
     "Notification",
+    "SimulationScenario",
+    "SimulationType",
+    "ScenarioStatus",
 ]

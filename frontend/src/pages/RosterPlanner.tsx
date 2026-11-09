@@ -21,7 +21,9 @@ import {
   Sparkles,
   History,
   UserCheck,
+  FlaskConical,
 } from 'lucide-react';
+import { RosterImpactSimulator } from '../components/planner/RosterImpactSimulator';
 
 export const RosterPlannerPage: React.FC = () => {
   const [currentMonth, setCurrentMonth] = useState<number>(11); // Default to current month (Nov 2026)
@@ -58,6 +60,17 @@ export const RosterPlannerPage: React.FC = () => {
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>([]);
   const [isLoadingAudit, setIsLoadingAudit] = useState(false);
+
+  // Impact Simulator States
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
+  const [simulatorContext, setSimulatorContext] = useState<{
+    employeeId?: number;
+    employeeName?: string;
+    date?: string;
+    brandId?: number;
+    brandName?: string;
+    processId?: number;
+  } | null>(null);
 
   const fetchRoster = async () => {
     setIsLoading(true);
@@ -286,6 +299,18 @@ export const RosterPlannerPage: React.FC = () => {
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
+
+          {/* RosterIQ Impact Simulator Button */}
+          <button
+            onClick={() => {
+              setSimulatorContext(null);
+              setIsSimulatorOpen(true);
+            }}
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 hover:from-teal-100 hover:to-emerald-100 text-teal-800 font-bold text-xs shadow-subtle transition-all group"
+          >
+            <FlaskConical className="w-4 h-4 text-teal-600 group-hover:rotate-12 transition-transform" />
+            <span>Impact Simulator</span>
+          </button>
 
           {/* Audit Trail Button */}
           <button
@@ -687,6 +712,25 @@ export const RosterPlannerPage: React.FC = () => {
 
             <div className="pt-2 space-y-2">
               <button
+                onClick={() => {
+                  setSimulatorContext({
+                    employeeId: selectedCell.row.employee_id,
+                    employeeName: selectedCell.row.employee_name,
+                    date: selectedCell.cell.date,
+                    brandId: selectedCell.cell.brand_id || undefined,
+                    brandName: selectedCell.cell.brand_name || undefined,
+                    processId: selectedCell.cell.process_id || undefined,
+                  });
+                  setSelectedCell(null);
+                  setIsSimulatorOpen(true);
+                }}
+                className="w-full py-2.5 rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-800 text-xs font-semibold flex items-center justify-center space-x-2 transition-all"
+              >
+                <FlaskConical className="w-4 h-4 text-teal-600" />
+                <span>Simulate Operational Impact</span>
+              </button>
+
+              <button
                 onClick={() => handleOpenReassignModal(selectedCell.row, selectedCell.cell)}
                 className="w-full py-2.5 rounded-xl bg-app-primaryAccent hover:bg-app-primaryAccentHover text-white text-xs font-semibold shadow-md shadow-teal-500/20 flex items-center justify-center space-x-2 transition-all"
               >
@@ -928,6 +972,17 @@ export const RosterPlannerPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* RosterIQ Impact Simulator Drawer */}
+      <RosterImpactSimulator
+        isOpen={isSimulatorOpen}
+        onClose={() => setIsSimulatorOpen(false)}
+        rosterId={gridData?.roster_id || 1}
+        month={currentMonth}
+        year={currentYear}
+        onRosterUpdated={fetchRoster}
+        initialContext={simulatorContext}
+      />
     </div>
   );
 };
