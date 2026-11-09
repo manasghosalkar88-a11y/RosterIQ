@@ -18,6 +18,8 @@ from app.models.conflict import SchedulingConflict, ConflictSeverity
 from app.models.leave import LeaveRequest, CompOff, ApprovalStatus
 from app.models.holiday import PublicHoliday
 from app.models.audit import AuditLog
+from app.models.allocation import EmployeeAssignment, AssignmentType
+from app.models.operating_rule import BrandProcessRule
 from app.schemas.overview import (
     OverviewDashboardResponse,
     OverviewKPIs,
@@ -27,6 +29,9 @@ from app.schemas.overview import (
     UpcomingHolidayItem,
     CriticalAlertItem,
     RecentChangeItem,
+    NetworkGraphResponse,
+    NetworkGraphNode,
+    NetworkGraphLink,
 )
 
 router = APIRouter(prefix="/overview", tags=["Overview Dashboard"])
@@ -200,3 +205,271 @@ def get_overview_summary(
         upcoming_holidays=upcoming_holidays,
         pending_approvals_count=pending_approvals,
     )
+
+
+@router.get("/network-graph", response_model=NetworkGraphResponse)
+def get_workforce_network_graph(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Returns authentic workforce relationship graph connecting:
+    - 5 Operational Pods
+    - 32 Employees
+    - 10 D2C Brands
+    - 4 Core Processes
+    Includes actual active conflicts, primary/backup allocations, and availability data.
+    """
+    pods = db.query(Pod).filter(Pod.is_active == True).all()
+    employees = db.query(Employee).filter(Employee.is_active == True).all()
+    brands = db.query(Brand).filter(Brand.is_active == True).all()
+    processes = db.query(Process).filter(Process.is_active == True).all()
+    assignments = db.query(EmployeeAssignment).filter(EmployeeAssignment.is_active == True).all()
+    rules = db.query(BrandProcessRule).all()
+    conflicts = db.query(SchedulingConflict).filter(SchedulingConflict.is_resolved == False).all()
+
+    # Brand conflict counts & severities
+    brand_conflicts: dict = {}
+    brand_has_critical: dict = {}
+    for c in conflicts:
+        if c.brand_id:
+            brand_conflicts[c.brand_id] = brand_conflicts.get(c.brand_id, 0) + 1
+            if c.severity == ConflictSeverity.CRITICAL:
+                brand_has_critical[c.brand_id] = True
+
+    # Process conflict counts
+    process_conflicts: dict = {}
+    process_has_critical: dict = {}
+    for c in conflicts:
+        if c.process_id:
+            process_conflicts[c.process_id] = process_conflicts.get(c.process_id, 0) + 1
+            if c.severity == ConflictSeverity.CRITICAL:
+                process_has_critical[c.process_id] = True
+
+    # Employee assignments mapping
+    emp_assignments_map: dict = {}
+    for a in assignments:
+        if a.employee_id not in emp_assignments_map:
+            emp_assignments_map[a.employee_id] = []
+        emp_assignments_map[a.employee_id].append(a)
+
+    # Brand assignments mapping
+    brand_assignments_map: dict = {}
+    for a in assignments:
+        if a.brand_id not in brand_assignments_map:
+            brand_assignments_map[a.brand_id] = []
+        brand_assignments_map[a.brand_id].append(a)
+
+    nodes: List[NetworkGraphNode] = []
+
+    # 1. Pod Nodes (Hubs)
+    for p in pods:
+        p_employees = [e for e in employees if e.pod_id == p.id]
+        p_brands = [b for b in brands if b.pod_id == p.id]
+        
+        has_critical = any(brand_has_critical.get(b.id, False) for b in p_brands)
+        has_any_conflict = any(brand_conflicts.get(b.id, 0) > 0 for b in p_brands)
+        
+        if has_critical:
+            p_status = "CONFLICT"
+        elif has_any_conflict:
+            p_status = "WARNING"
+        else:
+            p_status = "NORMAL"
+
+        nodes.append(NetworkGraphNode(
+            id=f"pod-{p.id}",
+            name=p.name,
+            code=p.code,
+            type="pod",
+            status=p_status,
+            employee_count=len(p_employees),
+            brand_count=len(p_brands),
+            conflict_count=sum(brand_conflicts.get(b.id, 0) for b in p_brands),
+            designation=f"Operational Pod Hub ({p.code})",
+        ))
+
+    # 2. Brand Nodes
+    for b in brands:
+        b_conflicts = brand_conflicts.get(b.id, 0)
+        is_crit = brand_has_critical.get(b.id, False)
+        b_assignments = brand_assignments_map.get(b.id, [])
+        primary_staff = [a for a in b_assignments if a.assignment_type == AssignmentType.PRIMARY]
+        is_single = len(primary_staff) <= 1
+        
+        if is_crit:
+            b_status = "CONFLICT"
+        elif b_conflicts > 0 or (is_single and len(b_assignments) <= 1):
+            b_status = "WARNING"
+        else:
+            b_status = "NORMAL"
+
+        assigned_emps = []
+        seen_emp = set()
+        for a in b_assignments:
+            if a.employee and a.employee.id not in seen_emp:
+                seen_emp.add(a.employee.id)
+                assigned_emps.append({
+                    "id": a.employee.id,
+                    "name": a.employee.full_name,
+                    "type": a.assignment_type.value,
+                })
+
+        b_rules = [r for r in rules if r.brand_id == b.id]
+        brand_procs = []
+        seen_p = set()
+        for r in b_rules:
+            if r.process and r.process.id not in seen_p:
+                seen_p.add(r.process.id)
+                brand_procs.append({
+                    "id": r.process.id,
+                    "code": r.process.code,
+                    "name": r.process.name,
+                })
+
+        nodes.append(NetworkGraphNode(
+            id=f"brand-{b.id}",
+            name=b.name,
+            code=b.code,
+            type="brand",
+            status=b_status,
+            pod_id=b.pod_id,
+            pod_name=b.pod.name if b.pod else None,
+            is_single_resource=is_single,
+            conflict_count=b_conflicts,
+            assigned_employees=assigned_emps,
+            assigned_processes=brand_procs,
+            designation=f"{'Single-Resource' if is_single else 'Multi-Resource'} Brand",
+        ))
+
+    # 3. Process Nodes
+    for pr in processes:
+        pr_conflicts = process_conflicts.get(pr.id, 0)
+        is_crit = process_has_critical.get(pr.id, False)
+        if is_crit:
+            pr_status = "CONFLICT"
+        elif pr_conflicts > 0:
+            pr_status = "WARNING"
+        else:
+            pr_status = "NORMAL"
+
+        pr_rules = [r for r in rules if r.process_id == pr.id]
+        nodes.append(NetworkGraphNode(
+            id=f"process-{pr.id}",
+            name=pr.name,
+            code=pr.code,
+            type="process",
+            status=pr_status,
+            conflict_count=pr_conflicts,
+            brand_count=len({r.brand_id for r in pr_rules}),
+            designation=f"Core Operational Process ({pr.code})",
+        ))
+
+    # 4. Employee Nodes
+    for e in employees:
+        e_assignments = emp_assignments_map.get(e.id, [])
+        assigned_brands_list = []
+        assigned_procs_list = []
+        seen_b = set()
+        seen_p = set()
+        
+        has_conflict_brand = False
+        has_warning_brand = False
+        
+        for a in e_assignments:
+            if a.brand and a.brand.id not in seen_b:
+                seen_b.add(a.brand.id)
+                assigned_brands_list.append({
+                    "id": a.brand.id,
+                    "name": a.brand.name,
+                    "type": a.assignment_type.value,
+                })
+                if brand_has_critical.get(a.brand.id, False):
+                    has_conflict_brand = True
+                elif brand_conflicts.get(a.brand.id, 0) > 0:
+                    has_warning_brand = True
+            
+            if a.process and a.process.id not in seen_p:
+                seen_p.add(a.process.id)
+                assigned_procs_list.append({
+                    "id": a.process.id,
+                    "code": a.process.code,
+                    "name": a.process.name,
+                })
+
+        if has_conflict_brand:
+            e_status = "CONFLICT"
+        elif has_warning_brand or len(assigned_brands_list) > 2:
+            e_status = "WARNING"
+        else:
+            e_status = "NORMAL"
+
+        off_day = e.default_off_pref or "Sunday"
+        availability = f"Active · {off_day} Off · Max {e.max_consecutive_days}d Limit"
+
+        nodes.append(NetworkGraphNode(
+            id=f"emp-{e.id}",
+            name=e.full_name,
+            code=e.employee_code,
+            type="employee",
+            status=e_status,
+            pod_id=e.pod_id,
+            pod_name=e.pod.name if e.pod else "General",
+            designation=e.designation or "Operations Specialist",
+            assigned_brands=assigned_brands_list,
+            assigned_processes=assigned_procs_list,
+            availability=availability,
+        ))
+
+    # Relational Links
+    links: List[NetworkGraphLink] = []
+
+    # Pod -> Employee
+    for e in employees:
+        if e.pod_id:
+            links.append(NetworkGraphLink(
+                source=f"pod-{e.pod_id}",
+                target=f"emp-{e.id}",
+                relation="POD_EMPLOYEE",
+            ))
+
+    # Pod -> Brand
+    for b in brands:
+        if b.pod_id:
+            links.append(NetworkGraphLink(
+                source=f"pod-{b.pod_id}",
+                target=f"brand-{b.id}",
+                relation="POD_BRAND",
+            ))
+
+    # Employee -> Brand
+    for a in assignments:
+        rel = "EMPLOYEE_BRAND_PRIMARY" if a.assignment_type == AssignmentType.PRIMARY else "EMPLOYEE_BRAND_BACKUP"
+        links.append(NetworkGraphLink(
+            source=f"emp-{a.employee_id}",
+            target=f"brand-{a.brand_id}",
+            relation=rel,
+        ))
+
+    # Brand -> Process
+    seen_bp = set()
+    for r in rules:
+        pair = (r.brand_id, r.process_id)
+        if pair not in seen_bp:
+            seen_bp.add(pair)
+            links.append(NetworkGraphLink(
+                source=f"brand-{r.brand_id}",
+                target=f"process-{r.process_id}",
+                relation="BRAND_PROCESS",
+            ))
+
+    return NetworkGraphResponse(
+        nodes=nodes,
+        links=links,
+        pods_count=len(pods),
+        employees_count=len(employees),
+        brands_count=len(brands),
+        processes_count=len(processes),
+        conflicts_count=len(conflicts),
+    )
+

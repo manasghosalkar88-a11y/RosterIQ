@@ -73,3 +73,39 @@ export interface OverviewDashboardResponse {
   upcoming_holidays: UpcomingHolidayItem[];
   pending_approvals_count: number;
 }
+
+export interface NetworkGraphNode {
+  id: string;
+  name: string;
+  type: 'pod' | 'employee' | 'brand' | 'process';
+  status: 'NORMAL' | 'WARNING' | 'CONFLICT';
+  code?: string;
+  pod_id?: number;
+  pod_name?: string;
+  designation?: string;
+  assigned_brands?: Array<{ id: number; name: string; type: string }>;
+  assigned_processes?: Array<{ id: number; code: string; name: string }>;
+  assigned_employees?: Array<{ id: number; name: string; type: string }>;
+  employee_count?: number;
+  brand_count?: number;
+  conflict_count: number;
+  availability?: string;
+  is_single_resource?: boolean;
+}
+
+export interface NetworkGraphLink {
+  source: string;
+  target: string;
+  relation: string;
+}
+
+export interface NetworkGraphResponse {
+  nodes: NetworkGraphNode[];
+  links: NetworkGraphLink[];
+  pods_count: number;
+  employees_count: number;
+  brands_count: number;
+  processes_count: number;
+  conflicts_count: number;
+}
+

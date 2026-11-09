@@ -77,3 +77,39 @@ class OverviewDashboardResponse(BaseModel):
     recent_changes: List[RecentChangeItem]
     upcoming_holidays: List[UpcomingHolidayItem]
     pending_approvals_count: int
+
+
+class NetworkGraphNode(BaseModel):
+    id: str
+    name: str
+    type: str  # "pod", "employee", "brand", "process"
+    status: str  # "NORMAL", "WARNING", "CONFLICT"
+    code: Optional[str] = None
+    pod_id: Optional[int] = None
+    pod_name: Optional[str] = None
+    designation: Optional[str] = None
+    assigned_brands: List[dict] = []
+    assigned_processes: List[dict] = []
+    assigned_employees: List[dict] = []
+    employee_count: Optional[int] = None
+    brand_count: Optional[int] = None
+    conflict_count: int = 0
+    availability: Optional[str] = None
+    is_single_resource: Optional[bool] = None
+
+
+class NetworkGraphLink(BaseModel):
+    source: str
+    target: str
+    relation: str  # "POD_EMPLOYEE", "POD_BRAND", "EMPLOYEE_BRAND_PRIMARY", "EMPLOYEE_BRAND_BACKUP", "BRAND_PROCESS"
+
+
+class NetworkGraphResponse(BaseModel):
+    nodes: List[NetworkGraphNode]
+    links: List[NetworkGraphLink]
+    pods_count: int
+    employees_count: int
+    brands_count: int
+    processes_count: int
+    conflicts_count: int
+
