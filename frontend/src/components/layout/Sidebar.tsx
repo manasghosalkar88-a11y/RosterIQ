@@ -59,27 +59,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`bg-app-sidebar text-slate-300 flex flex-col transition-all duration-300 relative border-r border-slate-800 ${
+      className={`bg-app-sidebar text-slate-300 flex flex-col transition-all duration-300 relative border-r border-[#2D3C4A] ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}
     >
       {/* Brand Header */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800/80">
+      <div className="h-16 flex items-center justify-between px-4 border-b border-[#2D3C4A]">
         {!isCollapsed && (
           <div className="flex items-center space-x-3 overflow-hidden">
-            <div className="w-9 h-9 rounded-xl bg-app-primaryAccent flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-teal-500/20 flex-shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-app-primaryAccent flex items-center justify-center text-[#FFFDF8] font-bold text-lg shadow-md shadow-black/20 flex-shrink-0">
               R
             </div>
             <div className="leading-tight">
-              <span className="font-bold text-white text-base tracking-tight block">RosterIQ</span>
-              <span className="text-[10px] text-teal-400 font-medium block">Smart Operations</span>
+              <span className="font-bold text-[#FFFDF8] text-base tracking-tight block">RosterIQ</span>
+              <span className="text-[10px] text-app-secondaryAccent font-medium block tracking-wider uppercase">Editorial Enterprise</span>
             </div>
           </div>
         )}
 
         {isCollapsed && (
           <div className="w-full flex justify-center">
-            <div className="w-9 h-9 rounded-xl bg-app-primaryAccent flex items-center justify-center text-white font-bold text-lg shadow-lg">
+            <div className="w-9 h-9 rounded-xl bg-app-primaryAccent flex items-center justify-center text-[#FFFDF8] font-bold text-lg shadow-md">
               R
             </div>
           </div>
@@ -87,7 +87,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <button
           onClick={onToggleCollapse}
-          className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+          className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-app-sidebarHover transition-colors"
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -106,12 +106,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => onSelectModule(item.name)}
               className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? 'bg-app-primaryAccent text-white shadow-md shadow-teal-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-app-sidebarHover'
+                  ? 'bg-app-primaryAccent text-white shadow-sm'
+                  : 'text-[#A0ABA8] hover:text-[#FFFDF8] hover:bg-app-sidebarHover'
               } ${isCollapsed ? 'justify-center px-0' : ''}`}
               title={isCollapsed ? item.name : undefined}
             >
-              <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+              <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-[#A0ABA8]'}`} />
               {!isCollapsed && <span className="truncate">{item.name}</span>}
             </button>
           );
@@ -120,12 +120,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Operational Pod & Version Footer */}
       {!isCollapsed && (
-        <div className="p-4 border-t border-slate-800/80 bg-slate-900/40 text-xs">
+        <div className="p-4 border-t border-[#2D3C4A] bg-[#1A232B] text-xs">
           <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span>DataStraw Ops</span>
-            <span className="text-[10px] bg-slate-800 text-teal-300 px-1.5 py-0.5 rounded font-mono">v1.0.0</span>
+            <span className="text-[11px] text-[#A0ABA8]">DataStraw Ops</span>
+            <span className="text-[10px] bg-app-sidebarHover text-app-secondaryAccent px-1.5 py-0.5 rounded font-mono">v1.2.0</span>
           </div>
-          <div className="text-[11px] text-slate-500 truncate">
+          <div className="text-[11px] text-slate-400 truncate">
             {user?.role === 'SUPER_ADMIN' ? 'Company Administration' : user?.full_name}
           </div>
         </div>
