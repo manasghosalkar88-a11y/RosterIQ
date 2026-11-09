@@ -270,6 +270,9 @@ const PaperCrumple = ({
   resetKey = 0,
   onStateChange,
   onError,
+  intro = 'none',
+  introDuration = 1.2,
+  onUnfoldComplete,
   className = '',
   style
 }) => {
@@ -292,7 +295,10 @@ const PaperCrumple = ({
     returnToOrigin,
     disabled,
     onStateChange,
-    onError
+    onError,
+    intro,
+    introDuration,
+    onUnfoldComplete
   });
   options.current = {
     releaseBehavior,
@@ -306,7 +312,10 @@ const PaperCrumple = ({
     returnToOrigin,
     disabled,
     onStateChange,
-    onError
+    onError,
+    intro,
+    introDuration,
+    onUnfoldComplete
   };
   useEffect(() => {
     const root = rootRef.current,
@@ -497,13 +506,18 @@ const PaperCrumple = ({
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.shadowMap.enabled = shadow;
     renderer.shadowMap.type = THREE.PCFShadowMap;
-    const amount = spring(),
+    const isUnfoldIntro = options.current.intro === 'unfold';
+    let isUnfolding = isUnfoldIntro;
+    const amount = spring(isUnfoldIntro ? 1.0 : 0.0),
       memory = spring(),
       posX = spring(),
       posY = spring(),
       tiltX = spring(),
       tiltY = spring();
     const springs = [amount, memory, posX, posY, tiltX, tiltY];
+    if (typeof window !== 'undefined') {
+      window.__paperAmount = () => ({ value: amount.value, target: amount.target, isUnfolding, isUnfoldIntro, held });
+    }
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
     const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
@@ -528,14 +542,14 @@ const PaperCrumple = ({
     let held = false,
       keyboard = false,
       pointerId = null;
-    let peak = 0,
+    let peak = isUnfoldIntro ? 1.0 : 0,
       disposed = false,
       ready = false,
       inView = true,
       contextLost = false;
     let frame = 0,
       lastTime = 0,
-      state = 'flat';
+      state = isUnfoldIntro ? 'crumpled' : 'flat';
     const textures = new Set();
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     let reduceMotion = media.matches;
@@ -646,11 +660,20 @@ const PaperCrumple = ({
       lastTime = time;
       const opts = options.current;
       let moving = false;
-      const duration = held ? finite(opts.crumpleDuration, 0.55) : finite(opts.releaseDuration, 0.4);
+      const duration = held
+        ? finite(opts.crumpleDuration, 0.55)
+        : isUnfolding
+          ? finite(opts.introDuration, 1.2)
+          : finite(opts.releaseDuration, 0.4);
       for (const s of springs)
         moving = advance(s, dt, s === amount || s === memory ? duration : 0.42, reduceMotion || keyboard) || moving;
       peak = Math.max(peak, amount.value);
       deform();
+      if (isUnfolding && amount.value <= 0.015 && amount.target === 0) {
+        isUnfolding = false;
+        publish('flat');
+        options.current.onUnfoldComplete?.();
+      }
       sheet.rotation.set(tiltX.value, tiltY.value, baseRotation);
       if (held && !keyboard && opts.draggable) {
         const attribute = geometry.attributes.position;
@@ -781,6 +804,7 @@ const PaperCrumple = ({
       wake();
     }
     function reset() {
+      isUnfolding = false;
       finish(true);
       for (const s of springs) s.target = s.value = s.velocity = 0;
       peak = 0;
@@ -790,6 +814,7 @@ const PaperCrumple = ({
     resetRef.current = reset;
     cancelRef.current = () => finish(true);
     function start() {
+      isUnfolding = false;
       held = true;
       peak = amount.value;
       amount.target = clamp(finite(options.current.crumpleAmount, 0.85), 0, 1);
@@ -1003,6 +1028,14 @@ const PaperCrumple = ({
           setStatus('ready');
           hit.disabled = options.current.disabled;
           wake();
+          if (isUnfoldIntro) {
+            setTimeout(() => {
+              if (disposed) return;
+              amount.target = 0;
+              publish('unfolding');
+              wake();
+            }, 850);
+          }
         })
         .catch(error => {
           if (disposed) return;
@@ -1064,8 +1097,11 @@ const PaperCrumple = ({
     seed,
     detail
   ]);
+  const initialResetKey = useRef(resetKey);
   useEffect(() => {
-    resetRef.current?.();
+    if (resetKey !== initialResetKey.current) {
+      resetRef.current?.();
+    }
   }, [resetKey]);
   useEffect(() => {
     if (disabled) cancelRef.current?.();
@@ -1084,9 +1120,9 @@ const PaperCrumple = ({
         ref={canvasRef}
         className="paper-crumple-canvas"
         aria-hidden="true"
-        style={{ visibility: status === 'ready' ? 'visible' : 'hidden', filter: shadowFilter }}
+        style={{ visibility: (status === 'ready' || intro === 'unfold') ? 'visible' : 'hidden', filter: shadowFilter }}
       />
-      {status !== 'ready' && (
+      {status !== 'ready' && intro !== 'unfold' && (
         <img
           className="paper-crumple-fallback"
           src={src || undefined}

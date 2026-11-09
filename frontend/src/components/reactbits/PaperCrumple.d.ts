@@ -33,7 +33,9 @@ export interface PaperCrumpleProps {
   disabled?: boolean;
   resetKey?: number;
   onStateChange?: (state: string) => void;
-  onError?: (error: Error) => void;
+  intro?: 'none' | 'unfold';
+  introDuration?: number;
+  onUnfoldComplete?: () => void;
   className?: string;
   style?: React.CSSProperties;
 }
