@@ -207,19 +207,19 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
 
       {/* Pending Approvals Callout Banner */}
       {data && data.pending_approvals_count > 0 && (
-        <div className="p-4 rounded-enterprise bg-amber-50 border border-amber-200 text-amber-900 flex items-center justify-between shadow-subtle">
+        <div className="p-4 rounded-enterprise bg-amber-950/30 border border-amber-800/40 text-amber-200 flex items-center justify-between shadow-subtle">
           <div className="flex items-center space-x-3">
-            <Clock className="w-5 h-5 text-amber-600 flex-shrink-0" />
+            <Clock className="w-5 h-5 text-amber-400 flex-shrink-0" />
             <div>
-              <div className="text-xs font-bold">Action Required: Pending Approvals Queue</div>
-              <div className="text-[11px] text-amber-700">
+              <div className="text-xs font-bold text-amber-200">Action Required: Pending Approvals Queue</div>
+              <div className="text-[11px] text-amber-400/80">
                 You have {data.pending_approvals_count} leave and comp-off requests waiting for operational review.
               </div>
             </div>
           </div>
           <button
             onClick={() => onNavigate('Approvals')}
-            className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs shadow-xs transition-all flex items-center space-x-1"
+            className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs shadow-xs transition-all flex items-center space-x-1"
           >
             <span>Review Approvals</span>
             <ArrowRight className="w-3.5 h-3.5" />

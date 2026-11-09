@@ -194,7 +194,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
         </div>
 
         <div className="flex items-center space-x-3">
-          <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#EAE6DC] text-app-primaryText border border-app-border inline-flex items-center space-x-1.5">
+          <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[#1E2226] text-app-primaryText border border-[#23262A] inline-flex items-center space-x-1.5">
             <Shield className="w-3.5 h-3.5 text-app-primaryAccent" />
             <span>Scoped RBAC Governance</span>
           </span>
@@ -206,10 +206,10 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
       {/* ========================================================================= */}
       <section
         ref={explorerRef}
-        className="bg-app-card rounded-enterprise border border-app-border shadow-card overflow-hidden"
+        className="bg-app-card rounded-enterprise border border-[#23262A] shadow-card overflow-hidden"
       >
         {/* Explorer Header */}
-        <div className="px-6 py-5 border-b border-app-border flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#FAF7F0]">
+        <div className="px-6 py-5 border-b border-[#23262A] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#151719]">
           <div>
             <div className="flex items-center space-x-2">
               <div className="w-7 h-7 rounded-lg bg-app-primaryAccent flex items-center justify-center text-[#FFFDF8] shadow-sm">
@@ -218,7 +218,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
               <h2 className="text-lg font-bold text-app-primaryText tracking-tight">
                 Operational Explorer
               </h2>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#DCE7DC] text-[#2D6359] border border-[#A4B9A9] uppercase">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-teal-950/60 text-teal-300 border border-teal-800/60 uppercase">
                 3D Kinetic Carousel
               </span>
             </div>
@@ -231,7 +231,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setAutoplayState(autoplayState === 'drift' ? 'off' : 'drift')}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#FFFDF8] hover:bg-[#EAE6DC] border border-app-border text-app-primaryText transition-colors flex items-center space-x-1.5"
+              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#151719] hover:bg-[#1E2226] border border-[#23262A] text-app-primaryText transition-colors flex items-center space-x-1.5"
               title={autoplayState === 'drift' ? 'Pause automatic carousel rotation' : 'Resume automatic carousel drift'}
             >
               {autoplayState === 'drift' ? (
@@ -250,7 +250,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
         </div>
 
         {/* 3D Circular Carousel Stage */}
-        <div className="relative w-full h-[400px] sm:h-[450px] bg-[#F5F2EB] flex items-center justify-center overflow-hidden border-b border-app-border">
+        <div className="relative w-full h-[400px] sm:h-[450px] bg-[#0C0D0E] flex items-center justify-center overflow-hidden border-b border-[#23262A]">
           {isLoading ? (
             <div className="text-center text-sm text-app-secondaryText flex items-center space-x-2">
               <div className="w-5 h-5 border-2 border-app-primaryAccent border-t-transparent rounded-full animate-spin" />
@@ -276,7 +276,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
                 pauseOnHover={true}
                 focusOnClick={true}
                 depthFade={0.35}
-                fadeColor="#F5F2EB"
+                fadeColor="#0C0D0E"
                 innerShade={0.12}
                 cornerRadius={16}
                 captions={true}
@@ -290,7 +290,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
         </div>
 
         {/* Direct Pod Selector Bar */}
-        <div className="px-6 py-3.5 bg-[#FFFDF8] border-b border-app-border flex items-center justify-between flex-wrap gap-2">
+        <div className="px-6 py-3.5 bg-[#151719] border-b border-[#23262A] flex items-center justify-between flex-wrap gap-2">
           <div className="text-xs font-semibold text-app-secondaryText flex items-center space-x-1.5">
             <span>Select Pod:</span>
           </div>
@@ -306,14 +306,14 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center space-x-2 border flex-shrink-0 ${
                     isSelected
                       ? 'bg-app-primaryAccent text-white border-app-primaryAccent shadow-sm'
-                      : 'bg-[#F5F2EB] text-app-primaryText border-app-border hover:bg-[#EAE6DC]'
+                      : 'bg-[#0C0D0E] text-app-primaryText border-[#23262A] hover:bg-[#1E2226]'
                   }`}
                 >
                   <span className="w-2 h-2 rounded-full bg-current opacity-80" />
                   <span>{shortName}</span>
                   <span
                     className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                      isSelected ? 'bg-white/20 text-white' : 'bg-[#EAE6DC] text-app-secondaryText'
+                      isSelected ? 'bg-white/20 text-white' : 'bg-[#1E2226] text-app-secondaryText'
                     }`}
                   >
                     {pod.employee_count}
@@ -330,10 +330,10 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
         {selectedPod && (
           <div className="p-6 md:p-8 space-y-6">
             {/* Inspector Title & Action Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-app-border">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#23262A]">
               <div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#EAE6DC] text-app-primaryText border border-app-border">
+                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#1E2226] text-app-primaryText border border-[#23262A]">
                     {selectedPod.code}
                   </span>
                   <h3 className="text-xl md:text-2xl font-bold text-app-primaryText">
@@ -359,7 +359,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
             {/* 4-Column Metric Strip */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Card 1: Pod Lead */}
-              <div className="p-4 rounded-xl bg-[#FAF7F0] border border-app-border space-y-2">
+              <div className="p-4 rounded-xl bg-[#151719] border border-[#23262A] space-y-2">
                 <span className="text-[10px] font-bold text-app-secondaryText uppercase tracking-wider block">
                   Designated Pod Lead
                 </span>
@@ -386,7 +386,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
               </div>
 
               {/* Card 2: Workforce Allocation */}
-              <div className="p-4 rounded-xl bg-[#FAF7F0] border border-app-border space-y-2">
+              <div className="p-4 rounded-xl bg-[#151719] border border-[#23262A] space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-app-secondaryText uppercase tracking-wider">
                     Workforce Allocation
@@ -406,7 +406,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
               </div>
 
               {/* Card 3: Managed Brand Accounts */}
-              <div className="p-4 rounded-xl bg-[#FAF7F0] border border-app-border space-y-2">
+              <div className="p-4 rounded-xl bg-[#151719] border border-[#23262A] space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-app-secondaryText uppercase tracking-wider">
                     Client Brands Portfolio
@@ -423,7 +423,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
                   {selectedPodBrands.map((b) => (
                     <span
                       key={b.id}
-                      className="text-[10px] px-1.5 py-0.5 rounded bg-[#EAE6DC] text-app-primaryText font-medium"
+                      className="text-[10px] px-1.5 py-0.5 rounded bg-[#1E2226] text-app-primaryText font-medium"
                     >
                       {b.name}
                     </span>
@@ -432,7 +432,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
               </div>
 
               {/* Card 4: Process Matrix & Operational SLA */}
-              <div className="p-4 rounded-xl bg-[#FAF7F0] border border-app-border space-y-2">
+              <div className="p-4 rounded-xl bg-[#151719] border border-[#23262A] space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-app-secondaryText uppercase tracking-wider">
                     Active Processes & SLA
@@ -469,14 +469,14 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
 
             {/* Active Processes Tag Bar */}
             {selectedPodProcesses.length > 0 && (
-              <div className="p-3 rounded-xl bg-[#F5F2EB] border border-app-border flex items-center flex-wrap gap-2 text-xs">
+              <div className="p-3 rounded-xl bg-[#0C0D0E] border border-[#23262A] flex items-center flex-wrap gap-2 text-xs">
                 <span className="font-bold text-app-primaryText text-[11px] uppercase tracking-wider mr-1">
                   Active Process Coverage:
                 </span>
                 {selectedPodProcesses.map((proc, i) => (
                   <span
                     key={i}
-                    className="px-2.5 py-1 rounded-lg bg-[#FFFDF8] text-app-primaryText border border-app-border font-medium text-xs flex items-center space-x-1.5 shadow-2xs"
+                    className="px-2.5 py-1 rounded-lg bg-[#151719] text-app-primaryText border border-[#23262A] font-medium text-xs flex items-center space-x-1.5 shadow-2xs"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-app-primaryAccent" />
                     <span>{proc}</span>
@@ -502,15 +502,15 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
                     value={staffSearchQuery}
                     onChange={(e) => setStaffSearchQuery(e.target.value)}
                     placeholder="Search pod staff..."
-                    className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-[#FFFDF8] border border-app-border text-xs text-app-primaryText placeholder-app-secondaryText focus:outline-none focus:ring-1 focus:ring-app-primaryAccent"
+                    className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-[#151719] border border-[#23262A] text-xs text-app-primaryText placeholder-app-secondaryText focus:outline-none focus:ring-1 focus:ring-app-primaryAccent"
                   />
                 </div>
               </div>
 
               {/* Employees Table */}
-              <div className="overflow-x-auto rounded-xl border border-app-border bg-[#FFFDF8]">
+              <div className="overflow-x-auto rounded-xl border border-[#23262A] bg-[#151719]">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-[#FAF7F0] border-b border-app-border text-[11px] text-app-secondaryText uppercase tracking-wider font-semibold">
+                  <thead className="bg-[#151719] border-b border-[#23262A] text-[11px] text-app-secondaryText uppercase tracking-wider font-semibold">
                     <tr>
                       <th className="py-2.5 px-4">Employee</th>
                       <th className="py-2.5 px-3">Designation</th>
@@ -529,7 +529,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
                       </tr>
                     ) : (
                       filteredPodEmployees.map((emp) => (
-                        <tr key={emp.id} className="hover:bg-[#F5F2EB]/50 transition-colors">
+                        <tr key={emp.id} className="hover:bg-[#0C0D0E]/50 transition-colors">
                           <td className="py-3 px-4">
                             <div className="font-bold text-app-primaryText">{emp.full_name}</div>
                             <div className="text-[10px] text-app-secondaryText font-mono">
@@ -543,7 +543,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
                                 emp.assigned_brands.map((ab, idx) => (
                                   <span
                                     key={idx}
-                                    className="text-[10px] px-1.5 py-0.5 rounded bg-[#EAE6DC] text-app-primaryText border border-app-border flex items-center space-x-1"
+                                    className="text-[10px] px-1.5 py-0.5 rounded bg-[#1E2226] text-app-primaryText border border-[#23262A] flex items-center space-x-1"
                                     title={`${ab.brand_name} - ${ab.process_name} (${ab.assignment_type})`}
                                   >
                                     <span className="font-semibold">{ab.brand_name}</span>
@@ -607,14 +607,14 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
                 <div
                   key={pod.id}
                   className={`bg-app-card rounded-enterprise border p-6 shadow-subtle hover:shadow-card transition-all flex flex-col justify-between ${
-                    isSelected ? 'border-app-primaryAccent ring-1 ring-app-primaryAccent' : 'border-app-border'
+                    isSelected ? 'border-app-primaryAccent ring-1 ring-app-primaryAccent' : 'border-[#23262A]'
                   }`}
                 >
                   <div>
                     {/* Pod Header */}
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#EAE6DC] text-app-primaryText border border-app-border uppercase font-semibold">
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1E2226] text-app-primaryText border border-[#23262A] uppercase font-semibold">
                           {pod.code}
                         </span>
                         <h3 className="font-bold text-app-primaryText text-lg mt-1.5">{pod.name}</h3>
@@ -627,7 +627,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
                     </p>
 
                     {/* Pod Lead Banner */}
-                    <div className="p-3.5 rounded-xl bg-[#FAF7F0] border border-app-border mb-4">
+                    <div className="p-3.5 rounded-xl bg-[#151719] border border-[#23262A] mb-4">
                       <span className="text-[10px] font-bold text-app-secondaryText uppercase tracking-wider block mb-1.5">
                         Designated Pod Lead
                       </span>
@@ -650,11 +650,11 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
 
                     {/* Pod Metrics */}
                     <div className="grid grid-cols-2 gap-3 mb-4 text-xs">
-                      <div className="p-2.5 rounded-xl bg-[#F5F2EB] border border-app-border text-center">
+                      <div className="p-2.5 rounded-xl bg-[#0C0D0E] border border-[#23262A] text-center">
                         <div className="text-base font-bold text-app-primaryAccent">{pod.employee_count}</div>
                         <div className="text-[11px] text-app-secondaryText">Staff Members</div>
                       </div>
-                      <div className="p-2.5 rounded-xl bg-[#F5F2EB] border border-app-border text-center">
+                      <div className="p-2.5 rounded-xl bg-[#0C0D0E] border border-[#23262A] text-center">
                         <div className="text-base font-bold text-app-primaryText">{pod.brand_count}</div>
                         <div className="text-[11px] text-app-secondaryText">Managed Brands</div>
                       </div>
@@ -669,7 +669,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
                         {podEmployees.slice(0, 5).map((e) => (
                           <div
                             key={e.id}
-                            className="flex items-center justify-between text-xs py-1 border-b border-app-border/40 last:border-0"
+                            className="flex items-center justify-between text-xs py-1 border-b border-[#23262A]/40 last:border-0"
                           >
                             <span className="font-medium text-app-primaryText truncate">{e.full_name}</span>
                             <span className="text-[10px] text-app-secondaryText font-mono">{e.employee_code}</span>
@@ -685,7 +685,7 @@ export const PodsTeamsPage: React.FC<PodsTeamsPageProps> = ({ onNavigate }) => {
                   </div>
 
                   {/* Card Bottom: Inspect in Explorer & Operational Badge */}
-                  <div className="pt-4 border-t border-app-border mt-4 flex items-center justify-between text-xs text-app-secondaryText">
+                  <div className="pt-4 border-t border-[#23262A] mt-4 flex items-center justify-between text-xs text-app-secondaryText">
                     <span className="text-[#56866B] font-semibold flex items-center space-x-1">
                       <UserCheck className="w-3.5 h-3.5" />
                       <span>Pod Operational</span>

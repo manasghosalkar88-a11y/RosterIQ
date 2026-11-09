@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { Login } from './pages/Login';
 import { Sidebar } from './components/layout/Sidebar';
 import { Navbar } from './components/layout/Navbar';
+import { TopologyMesh } from './components/3d/TopologyMesh';
 import { EmployeesPage } from './pages/Employees';
 import { BrandsPage } from './pages/Brands';
 import { ProcessesPage } from './pages/Processes';
@@ -26,11 +27,11 @@ const MainApp: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-app-bg flex flex-col items-center justify-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-app-primaryAccent flex items-center justify-center text-white font-bold text-2xl animate-pulse shadow-lg">
+      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-app-primaryAccent flex items-center justify-center text-white font-bold text-2xl animate-pulse shadow-lg shadow-teal-500/20">
           R
         </div>
-        <p className="text-sm font-semibold text-app-primaryText tracking-wide">
+        <p className="text-sm font-semibold text-gray-300 tracking-wide">
           Loading RosterIQ Operations...
         </p>
       </div>
@@ -42,17 +43,22 @@ const MainApp: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-app-bg flex overflow-hidden">
+    <div className="authenticated-app min-h-screen bg-[#050505] text-white flex overflow-hidden relative selection:bg-teal-500/30 selection:text-white">
+      {/* Full-Screen 3D Topology Mesh Background (Parametric MOBIUS / WAVE / HELIX / CYLINDER) */}
+      <TopologyMesh subtle={true} />
+
       {/* Collapsible Left Navigation Sidebar */}
-      <Sidebar
-        currentModule={currentModule}
-        onSelectModule={setCurrentModule}
-        isCollapsed={isSidebarCollapsed}
-        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-      />
+      <div className="relative z-20 flex-shrink-0">
+        <Sidebar
+          currentModule={currentModule}
+          onSelectModule={setCurrentModule}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
+      </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative z-10">
         <Navbar currentModule={currentModule} />
 
         <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">
@@ -72,7 +78,7 @@ const MainApp: React.FC = () => {
           {currentModule === 'Overview' && <OverviewPage onNavigate={setCurrentModule} />}
           {currentModule === 'Settings' && <SettingsPage />}
 
-          {/* Placeholder for modules coming in later phases */}
+          {/* Placeholder for fallback modules */}
           {![
             'Overview',
             'Roster Planner',
@@ -89,17 +95,17 @@ const MainApp: React.FC = () => {
             'Notifications',
             'Settings',
           ].includes(currentModule) && (
-            <div className="bg-white rounded-enterprise border border-app-border p-12 text-center shadow-subtle">
-              <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-4">
+            <div className="bg-[#151719] rounded-enterprise border border-[#23262A] p-12 text-center shadow-card">
+              <div className="w-14 h-14 rounded-2xl bg-teal-950/50 text-teal-400 flex items-center justify-center mx-auto mb-4 border border-teal-800/40">
                 <Shield className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-bold text-app-primaryText">{currentModule}</h3>
-              <p className="text-sm text-app-secondaryText max-w-md mx-auto mt-2">
+              <h3 className="text-xl font-bold text-white">{currentModule}</h3>
+              <p className="text-sm text-gray-400 max-w-md mx-auto mt-2">
                 This module connects to Approvals, Analytics, and Notifications coming in Phases 11 through 14.
               </p>
               <button
                 onClick={() => setCurrentModule('Roster Planner')}
-                className="mt-6 px-4 py-2 rounded-xl bg-app-primaryAccent text-white text-xs font-semibold shadow-md shadow-teal-500/20"
+                className="mt-6 px-4 py-2 rounded-xl bg-app-primaryAccent text-white text-xs font-semibold shadow-md shadow-teal-500/20 hover:bg-app-primaryAccentHover transition-all"
               >
                 Go to Roster Planner
               </button>
