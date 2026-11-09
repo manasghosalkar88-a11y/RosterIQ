@@ -119,7 +119,7 @@ export default function App() {
     <AuthProvider>
       <div className="relative min-h-screen bg-[#050505] text-[#F5F7FA] overflow-hidden selection:bg-teal-500/30 selection:text-white">
         {/* Shared Full-Screen 3D Topology Mesh Background (Parametric MOBIUS / WAVE / HELIX / CYLINDER) */}
-        <TopologyMesh subtle={true} />
+        <TopologyMesh subtle={false} />
         <MainApp />
       </div>
     </AuthProvider>

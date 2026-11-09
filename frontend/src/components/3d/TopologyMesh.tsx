@@ -92,7 +92,7 @@ export const TopologyMesh: React.FC<TopologyMeshProps> = ({
 
     // Initialize flowing active particles across topology mesh lines
     const activeParticles: ActiveParticle[] = [];
-    for (let p = 0; p < 45; p++) {
+    for (let p = 0; p < 70; p++) {
       activeParticles.push({
         pointIndex: Math.floor(Math.random() * TOTAL_POINTS),
         progress: Math.random(),
@@ -303,7 +303,7 @@ export const TopologyMesh: React.FC<TopologyMeshProps> = ({
       // 2. Render Mesh Edges (Horizontal and Vertical Connections)
       const focalLength = 800;
       const cameraDist = 600;
-      const baseOpacityFactor = subtle ? 0.38 : 0.65;
+      const baseOpacityFactor = subtle ? 0.70 : 1.0;
 
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
@@ -316,7 +316,7 @@ export const TopologyMesh: React.FC<TopologyMeshProps> = ({
           const py = centerY + pt.y * persp;
 
           // Depth-based alpha fade
-          const depthAlpha = Math.max(0.08, Math.min(1, 1 - (pt.z + 300) / 600));
+          const depthAlpha = Math.max(0.15, Math.min(1, 1 - (pt.z + 300) / 600));
 
           // A. Horizontal connection (right neighbor)
           let hasH = false;
@@ -346,16 +346,16 @@ export const TopologyMesh: React.FC<TopologyMeshProps> = ({
 
               if (edgeExcitation > 0.06) {
                 // Excited wireframe: vivid teal with white core
-                ctx.strokeStyle = `rgba(20, 184, 166, ${Math.min(0.95, (depthAlpha * 0.4 + edgeExcitation) * baseOpacityFactor * 2.2)})`;
-                ctx.lineWidth = 1 + edgeExcitation * 1.8;
+                ctx.strokeStyle = `rgba(20, 184, 166, ${Math.min(0.98, (depthAlpha * 0.4 + edgeExcitation) * baseOpacityFactor * 2.2)})`;
+                ctx.lineWidth = 1.2 + edgeExcitation * 1.8;
               } else {
                 // Primary soft white lines (#E5E7EB) or secondary muted teal (#397C70)
                 if (r % 2 === 0) {
                   // Primary soft white lines
-                  ctx.strokeStyle = `rgba(229, 231, 235, ${depthAlpha * 0.22 * baseOpacityFactor})`;
+                  ctx.strokeStyle = `rgba(229, 231, 235, ${Math.min(0.75, (depthAlpha * 0.36 + 0.12) * baseOpacityFactor)})`;
                 } else {
                   // Secondary muted teal lines
-                  ctx.strokeStyle = `rgba(57, 124, 112, ${depthAlpha * 0.32 * baseOpacityFactor})`;
+                  ctx.strokeStyle = `rgba(57, 124, 112, ${Math.min(0.85, (depthAlpha * 0.46 + 0.16) * baseOpacityFactor)})`;
                 }
                 ctx.lineWidth = 1;
               }
@@ -379,13 +379,13 @@ export const TopologyMesh: React.FC<TopologyMeshProps> = ({
               const edgeExcitation = Math.max(pt.excitation, neighbor.excitation);
 
               if (edgeExcitation > 0.06) {
-                ctx.strokeStyle = `rgba(20, 184, 166, ${Math.min(0.95, (depthAlpha * 0.4 + edgeExcitation) * baseOpacityFactor * 2.2)})`;
-                ctx.lineWidth = 1 + edgeExcitation * 1.8;
+                ctx.strokeStyle = `rgba(20, 184, 166, ${Math.min(0.98, (depthAlpha * 0.4 + edgeExcitation) * baseOpacityFactor * 2.2)})`;
+                ctx.lineWidth = 1.2 + edgeExcitation * 1.8;
               } else {
                 if (c % 2 === 0) {
-                  ctx.strokeStyle = `rgba(229, 231, 235, ${depthAlpha * 0.18 * baseOpacityFactor})`;
+                  ctx.strokeStyle = `rgba(229, 231, 235, ${Math.min(0.70, (depthAlpha * 0.32 + 0.10) * baseOpacityFactor)})`;
                 } else {
-                  ctx.strokeStyle = `rgba(57, 124, 112, ${depthAlpha * 0.28 * baseOpacityFactor})`;
+                  ctx.strokeStyle = `rgba(57, 124, 112, ${Math.min(0.80, (depthAlpha * 0.42 + 0.14) * baseOpacityFactor)})`;
                 }
                 ctx.lineWidth = 1;
               }
@@ -458,19 +458,19 @@ export const TopologyMesh: React.FC<TopologyMeshProps> = ({
           const cy = sy + (ey - sy) * ap.progress;
           const avgPersp = (sPersp + ePersp) * 0.5;
 
-          const depthAlpha = Math.max(0.15, Math.min(1, 1 - ((startPt.z + endPt.z) * 0.5 + 300) / 600));
+          const depthAlpha = Math.max(0.25, Math.min(1, 1 - ((startPt.z + endPt.z) * 0.5 + 300) / 600));
 
           if (ap.color === 'teal') {
             // Active Teal Particle
-            ctx.fillStyle = `rgba(20, 184, 166, ${depthAlpha * 0.85})`;
+            ctx.fillStyle = `rgba(20, 184, 166, ${depthAlpha * 0.95})`;
             ctx.beginPath();
-            ctx.arc(cx, cy, 2.2 * avgPersp, 0, Math.PI * 2);
+            ctx.arc(cx, cy, 2.6 * avgPersp, 0, Math.PI * 2);
             ctx.fill();
           } else {
             // Active White Particle
-            ctx.fillStyle = `rgba(255, 255, 255, ${depthAlpha * 0.95})`;
+            ctx.fillStyle = `rgba(255, 255, 255, ${depthAlpha * 0.98})`;
             ctx.beginPath();
-            ctx.arc(cx, cy, 1.8 * avgPersp, 0, Math.PI * 2);
+            ctx.arc(cx, cy, 2.0 * avgPersp, 0, Math.PI * 2);
             ctx.fill();
           }
         }
@@ -538,11 +538,11 @@ export const TopologyMesh: React.FC<TopologyMeshProps> = ({
       <canvas
         ref={canvasRef}
         onClick={handleCanvasClick}
-        className="absolute inset-0 block h-full w-full pointer-events-auto cursor-default opacity-85"
+        className="absolute inset-0 block h-full w-full pointer-events-auto cursor-default opacity-100"
       />
 
       {/* Subtle Bottom Ambient Gradient for UI Depth */}
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#050505]/30 to-transparent pointer-events-none" />
 
       {/* Floating Interactive 21st.dev Control Pill */}
       {showControls && (

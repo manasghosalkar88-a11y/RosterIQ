@@ -40,25 +40,25 @@ body {
 /* ROSTERIQ DARK GLASS ENTERPRISE UTILITY CLASSES */
 
 .glass-card {
-  background: rgba(23, 28, 34, 0.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(23, 28, 34, 0.76);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.10);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
 }
 
 .glass-card-secondary {
-  background: rgba(30, 36, 43, 0.78);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(30, 36, 43, 0.68);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.35);
 }
 
 .glass-card-deep {
-  background: rgba(23, 28, 34, 0.92);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: rgba(23, 28, 34, 0.90);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.7), 0 6px 12px -2px rgba(0, 0, 0, 0.5);
 }
@@ -84,6 +84,7 @@ body {
 }
 
 .neumorph-btn {
+  background: #397C70;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.18);
   transition: all 0.15s ease-in-out;
 }
@@ -99,9 +100,9 @@ body {
 
 /* Authenticated Application Dark Theme Overrides for Existing Components */
 .authenticated-app .bg-white {
-  background-color: rgba(23, 28, 34, 0.88) !important;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background-color: rgba(23, 28, 34, 0.76) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .authenticated-app .bg-slate-50,

@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import type { OverviewDashboardResponse } from '../types/overview';
+import CircularCarousel from '../components/reactbits/CircularCarousel';
+import { generateDashboardCarouselCards } from '../utils/dashboardCards';
 import { WorkforceNetwork } from '../components/3d/WorkforceNetwork';
 import {
   Users,
@@ -14,9 +16,11 @@ import {
   Palmtree,
   History,
   Sparkles,
-  FlaskConical,
-  Download,
+  BarChart3,
   CheckCircle2,
+  Network,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 
 interface OverviewPageProps {
@@ -27,6 +31,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
   const { user } = useAuth();
   const [data, setData] = useState<OverviewDashboardResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showNetworkGraph, setShowNetworkGraph] = useState(false);
 
   const fetchOverview = async () => {
     setIsLoading(true);
@@ -44,96 +49,141 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
     fetchOverview();
   }, []);
 
+  // Generate 8 branded, data-driven cards for CircularCarousel
+  const carouselItems = useMemo(() => {
+    if (!data) return [];
+    return generateDashboardCarouselCards({
+      totalEmployees: data.kpis.total_employees,
+      activeBrands: data.kpis.active_brands,
+      activeProcesses: data.kpis.active_processes,
+      totalPods: data.kpis.total_pods,
+      workingToday: data.today_status.working_count || data.kpis.working_today,
+      onLeaveToday: data.today_status.leave_count || data.kpis.on_leave_today,
+      coveragePercentage: data.kpis.coverage_percentage,
+      unresolvedConflicts: data.kpis.unresolved_conflicts,
+      monthName: data.today_status.day_name,
+      fairnessScore: 71.9,
+    });
+  }, [data]);
+
   if (isLoading && !data) {
     return (
       <div className="glass-card p-16 text-center rounded-enterprise shadow-glass text-[#A0AAB5] flex flex-col items-center justify-center space-y-3">
         <div className="w-8 h-8 border-2 border-teal-400 border-t-transparent rounded-full animate-spin" />
-        <span className="text-sm font-mono tracking-wider uppercase">Loading Operations Control Center...</span>
+        <span className="text-sm font-mono tracking-wider uppercase">Loading RosterIQ Command Centre...</span>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* 1. Operational Hero Card & 3D Live Workforce Network */}
-      <div className="bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] rounded-enterprise border border-white/10 overflow-hidden shadow-glass">
-        <div className="grid grid-cols-1 lg:grid-cols-12 items-center">
-          {/* Left: Operational Hero Information & Action Buttons */}
-          <div className="p-6 md:p-8 lg:col-span-7 space-y-4">
+      {/* ========================================================================= */}
+      {/* 1. MAIN HERO: RosterIQ Command Centre Heading & 3D CircularCarousel       */}
+      {/* ========================================================================= */}
+      <div className="glass-card rounded-enterprise border border-white/10 overflow-hidden shadow-glass relative">
+        <div className="grid grid-cols-1 lg:grid-cols-12 items-center min-h-[460px]">
+          {/* Left Column: Command Centre Information & Navigation Actions */}
+          <div className="p-6 md:p-8 lg:col-span-5 space-y-4 z-10">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-teal-950/70 text-teal-300 border border-teal-800/60 font-mono uppercase tracking-wider">
-                Active Role: {user?.role.replace('_', ' ')}
+                {user?.role.replace('_', ' ')}
               </span>
-              <span className="text-xs text-[#A0AAB5] font-medium font-mono">· DataStraw Operations Control</span>
+              <span className="text-xs text-[#A0AAB5] font-mono">· DataStraw Enterprise Operations</span>
             </div>
 
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-[#F5F7FA] tracking-tight">
-                Operations Control Center
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F5F7FA] tracking-tight">
+                RosterIQ Command Centre
               </h1>
-              <p className="text-xs md:text-sm text-[#A0AAB5] mt-1.5 leading-relaxed max-w-xl">
-                Real-time workforce deployment, multi-brand coverage matrices, and intelligent shortfall resolution across 5 operational pods and 10 D2C brands.
+              <p className="text-xs sm:text-sm text-[#A0AAB5] mt-2 leading-relaxed">
+                Deterministic operations management, multi-brand resource matrices, and intelligent shortfall resolution across our enterprise workforce.
               </p>
             </div>
 
-            {/* Action Buttons: Generate Monthly Roster, Simulate Impact, Export Roster */}
-            <div className="flex flex-wrap items-center gap-2.5 pt-2">
+            {/* Operational Telemetry Status Pills */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-mono">
+              <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-[#0B0E12] border border-white/10 text-[#F5F7FA]">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>{data?.kpis.total_employees || 32} Specialists Active</span>
+              </span>
+              <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-[#0B0E12] border border-white/10 text-teal-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
+                <span>Zero Silent Shortfalls</span>
+              </span>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
               <button
                 onClick={() => onNavigate('Roster Planner')}
-                className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#397C70] hover:bg-[#2D6359] text-white text-xs font-bold uppercase tracking-wider shadow-neumorph-btn active:translate-y-0.5 transition-all"
+                className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#397C70] hover:bg-[#2D6359] text-white text-xs font-bold uppercase tracking-wider shadow-neumorph-btn active:translate-y-0.5 transition-all cursor-pointer"
               >
                 <Sparkles className="w-3.5 h-3.5 text-teal-200" />
-                <span>Generate Monthly Roster</span>
+                <span>Open Roster Planner</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
 
               <button
-                onClick={() => onNavigate('Roster Planner')}
-                className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[rgba(30,36,43,0.78)] hover:bg-[rgba(38,46,55,0.9)] border border-white/10 text-white text-xs font-semibold shadow-sm transition-all"
-                title="Launch RosterIQ Impact Simulator"
+                onClick={() => onNavigate('Analytics & Reports')}
+                className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-[rgba(30,36,43,0.78)] hover:bg-[rgba(38,46,55,0.9)] border border-white/10 text-[#F5F7FA] hover:text-white text-xs font-semibold shadow-sm transition-all cursor-pointer"
               >
-                <FlaskConical className="w-3.5 h-3.5 text-teal-400" />
-                <span>Simulate Impact</span>
-              </button>
-
-              <button
-                onClick={() => onNavigate('Roster Planner')}
-                className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-[#0B0E12] hover:bg-[#15191E] border border-white/10 text-[#A0AAB5] hover:text-white text-xs font-semibold shadow-sm transition-all"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Export Matrix</span>
+                <BarChart3 className="w-3.5 h-3.5 text-teal-400" />
+                <span>View Analytics</span>
               </button>
             </div>
+
+            {/* Interaction Cue */}
+            <p className="text-[11px] text-[#727E89] font-mono pt-1">
+              ✦ Click any 3D card in the circular carousel to jump directly into that operational module.
+            </p>
           </div>
 
-          {/* Right: Embedded Live Workforce Network (Three.js 3D Graph) */}
-          <div className="lg:col-span-5 h-64 lg:h-72 bg-gradient-to-br from-[#0B0E12] via-[#090B0E] to-[#050505] relative flex flex-col items-center justify-center overflow-hidden border-t lg:border-t-0 lg:border-l border-white/10">
-            <div className="absolute top-3 left-4 z-10 flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-teal-400 animate-ping" />
-              <span className="text-[11px] font-mono text-teal-300 font-semibold uppercase tracking-wider">
-                Live Workforce Network (3D)
-              </span>
-            </div>
-
-            <WorkforceNetwork totalEmployees={data?.kpis.total_employees || 32} podCount={data?.kpis.total_pods || 5} />
-
-            <div className="absolute bottom-3 right-4 z-10 text-[10px] text-gray-500 font-mono">
-              32 Nodes · 5 Hubs · Rotating Graph
-            </div>
+          {/* Right Column: Large 3D CircularCarousel Stage */}
+          <div className="lg:col-span-7 h-[440px] sm:h-[480px] relative w-full flex items-center justify-center overflow-hidden border-t lg:border-t-0 lg:border-l border-white/10 bg-transparent">
+            {carouselItems.length > 0 && (
+              <CircularCarousel
+                items={carouselItems}
+                preset="cylinder"
+                intro="assemble"
+                cardWidth={250}
+                aspectRatio={1.35}
+                speed={9}
+                autoplay="drift"
+                direction="left"
+                draggable={true}
+                momentum={0.6}
+                snap={true}
+                pauseOnHover={true}
+                focusOnClick={true}
+                parallax={0.25}
+                stretch={0.3}
+                depthFade={0.3}
+                fadeColor="#050505"
+                cornerRadius={16}
+                captions={true}
+                onItemClick={(item: any) => {
+                  if (item.targetModule) {
+                    onNavigate(item.targetModule);
+                  }
+                }}
+              />
+            )}
           </div>
         </div>
       </div>
 
-      {/* 2. Eight Operational KPI Cards */}
+      {/* ========================================================================= */}
+      {/* 2. FOUR PREMIUM GLASS KPI CARDS                                           */}
+      {/* ========================================================================= */}
       {data && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {/* Card 1: Total Active Workforce */}
+          {/* Card 1: Total Employees */}
           <div
             onClick={() => onNavigate('Employees')}
-            className="bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised hover:-translate-y-1 hover:border-teal-500/40 cursor-pointer transition-all group"
+            className="glass-card p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised hover:-translate-y-1 hover:border-teal-500/40 cursor-pointer transition-all group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0AAB5]">Total Workforce</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0AAB5]">Total Employees</span>
               <div className="p-1.5 rounded-lg bg-teal-950/60 border border-teal-800/50">
                 <Users className="w-3.5 h-3.5 text-teal-400 group-hover:scale-110 transition-transform" />
               </div>
@@ -145,13 +195,13 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* Card 2: Operating Brands */}
+          {/* Card 2: Active Brands */}
           <div
             onClick={() => onNavigate('Brands')}
-            className="bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised hover:-translate-y-1 hover:border-teal-500/40 cursor-pointer transition-all group"
+            className="glass-card p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised hover:-translate-y-1 hover:border-teal-500/40 cursor-pointer transition-all group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0AAB5]">Operating Brands</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0AAB5]">Active Brands</span>
               <div className="p-1.5 rounded-lg bg-blue-950/60 border border-blue-800/50">
                 <Building2 className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
               </div>
@@ -160,13 +210,13 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
             <div className="text-[11px] text-[#A0AAB5] mt-0.5">80% Single-Resource model</div>
           </div>
 
-          {/* Card 3: Core Processes */}
+          {/* Card 3: Active Processes */}
           <div
             onClick={() => onNavigate('Processes')}
-            className="bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised hover:-translate-y-1 hover:border-teal-500/40 cursor-pointer transition-all group"
+            className="glass-card p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised hover:-translate-y-1 hover:border-teal-500/40 cursor-pointer transition-all group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0AAB5]">Core Processes</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0AAB5]">Active Processes</span>
               <div className="p-1.5 rounded-lg bg-purple-950/60 border border-purple-800/50">
                 <Cpu className="w-3.5 h-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
               </div>
@@ -178,7 +228,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
           {/* Card 4: Operational Pods */}
           <div
             onClick={() => onNavigate('Pods & Teams')}
-            className="bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised hover:-translate-y-1 hover:border-teal-500/40 cursor-pointer transition-all group"
+            className="glass-card p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised hover:-translate-y-1 hover:border-teal-500/40 cursor-pointer transition-all group"
           >
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0AAB5]">Operational Pods</span>
@@ -189,34 +239,45 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
             <div className="text-2xl font-bold text-[#F5F7FA] mt-2 tracking-tight">{data.kpis.total_pods}</div>
             <div className="text-[11px] text-[#A0AAB5] mt-0.5">Pods Alpha to Epsilon</div>
           </div>
+        </div>
+      )}
 
-          {/* Card 5: Schedule Health / Working Today */}
-          <div className="bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised">
+      {/* ========================================================================= */}
+      {/* 3. FOUR OPERATIONAL METRICS                                               */}
+      {/* ========================================================================= */}
+      {data && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* Metric 1: Working Today */}
+          <div className="glass-card p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0AAB5]">Working Today</span>
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50 animate-pulse" />
             </div>
-            <div className="text-2xl font-bold text-emerald-400 mt-2 tracking-tight">{data.kpis.working_today}</div>
+            <div className="text-2xl font-bold text-emerald-400 mt-2 tracking-tight">
+              {data.today_status.working_count || data.kpis.working_today}
+            </div>
             <div className="text-[11px] text-emerald-400/80 font-medium mt-0.5">Active on client shifts</div>
           </div>
 
-          {/* Card 6: On Leave Today */}
-          <div className="bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised">
+          {/* Metric 2: On Leave Today */}
+          <div className="glass-card p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0AAB5]">On Leave Today</span>
               <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm shadow-amber-400/50" />
             </div>
-            <div className="text-2xl font-bold text-amber-400 mt-2 tracking-tight">{data.kpis.on_leave_today}</div>
+            <div className="text-2xl font-bold text-amber-400 mt-2 tracking-tight">
+              {data.today_status.leave_count || data.kpis.on_leave_today}
+            </div>
             <div className="text-[11px] text-amber-400/80 font-medium mt-0.5">Planned / Casual time-off</div>
           </div>
 
-          {/* Card 7: Roster Coverage / Fill Rate */}
+          {/* Metric 3: Roster Coverage */}
           <div
             onClick={() => onNavigate('Roster Planner')}
-            className="bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised hover:-translate-y-1 hover:border-teal-500/40 cursor-pointer transition-all group"
+            className="glass-card p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised hover:-translate-y-1 hover:border-teal-500/40 cursor-pointer transition-all group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0AAB5]">Coverage Fill Rate</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0AAB5]">Roster Coverage</span>
               <div className="p-1.5 rounded-lg bg-teal-950/60 border border-teal-800/50">
                 <TrendingUp className="w-3.5 h-3.5 text-teal-400 group-hover:scale-110 transition-transform" />
               </div>
@@ -225,13 +286,13 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
             <div className="text-[11px] text-[#A0AAB5] mt-0.5">Target &gt; 95% SLA achieved</div>
           </div>
 
-          {/* Card 8: Unresolved Coverage Conflicts */}
+          {/* Metric 4: Unresolved Gaps */}
           <div
             onClick={() => onNavigate('Conflicts & Alerts')}
-            className="bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised hover:-translate-y-1 hover:border-teal-500/40 cursor-pointer transition-all group"
+            className="glass-card p-4 rounded-enterprise border border-white/10 shadow-neumorph-raised hover:-translate-y-1 hover:border-teal-500/40 cursor-pointer transition-all group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0AAB5]">Coverage Conflicts</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#A0AAB5]">Unresolved Gaps</span>
               <div className="p-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800/50">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
               </div>
@@ -242,7 +303,9 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* 3. Pending Approvals Callout Banner */}
+      {/* ========================================================================= */}
+      {/* 4. PENDING APPROVALS CALLOUT BANNER                                       */}
+      {/* ========================================================================= */}
       {data && data.pending_approvals_count > 0 && (
         <div className="p-4 rounded-enterprise bg-amber-950/40 backdrop-blur-[14px] border border-amber-500/30 text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-glass">
           <div className="flex items-center space-x-3">
@@ -268,11 +331,13 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* 4. Modular Operational Widgets */}
+      {/* ========================================================================= */}
+      {/* 5. MODULAR OPERATIONAL WIDGETS                                            */}
+      {/* ========================================================================= */}
       {data && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Widget 1: Today's Operating Workforce */}
-          <div className="bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] rounded-enterprise border border-white/10 p-5 shadow-glass space-y-3">
+          <div className="glass-card rounded-enterprise border border-white/10 p-5 shadow-glass space-y-3">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div>
                 <h3 className="text-sm font-bold text-[#F5F7FA]">Today's Operating Workforce</h3>
@@ -307,7 +372,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
           </div>
 
           {/* Widget 2: Critical Coverage Alerts */}
-          <div className="bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] rounded-enterprise border border-white/10 p-5 shadow-glass space-y-3">
+          <div className="glass-card rounded-enterprise border border-white/10 p-5 shadow-glass space-y-3">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div>
                 <h3 className="text-sm font-bold text-[#F5F7FA]">Critical Coverage Alerts</h3>
@@ -343,7 +408,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
           </div>
 
           {/* Widget 3: Recent Operational Changes */}
-          <div className="bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] rounded-enterprise border border-white/10 p-5 shadow-glass space-y-3">
+          <div className="glass-card rounded-enterprise border border-white/10 p-5 shadow-glass space-y-3">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center space-x-2">
                 <History className="w-4 h-4 text-teal-400" />
@@ -372,7 +437,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
           </div>
 
           {/* Widget 4: Upcoming Public Holidays & Leaves */}
-          <div className="bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] rounded-enterprise border border-white/10 p-5 shadow-glass space-y-3">
+          <div className="glass-card rounded-enterprise border border-white/10 p-5 shadow-glass space-y-3">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center space-x-2">
                 <Palmtree className="w-4 h-4 text-purple-400" />
@@ -403,6 +468,44 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
           </div>
         </div>
       )}
+
+      {/* ========================================================================= */}
+      {/* 6. PRESERVED INTERACTIVE 3D LIVE WORKFORCE NETWORK                        */}
+      {/* ========================================================================= */}
+      <div className="glass-card rounded-enterprise border border-white/10 overflow-hidden shadow-glass">
+        <div
+          onClick={() => setShowNetworkGraph(!showNetworkGraph)}
+          className="p-4 px-6 flex items-center justify-between cursor-pointer hover:bg-white/5 transition-colors border-b border-white/10 select-none"
+        >
+          <div className="flex items-center space-x-3">
+            <div className="p-2 rounded-xl bg-teal-950/60 border border-teal-800/60 text-teal-400">
+              <Network className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h3 className="text-sm font-bold text-[#F5F7FA]">Live Workforce Relationship Network</h3>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-teal-950/70 text-teal-300 border border-teal-800/60 font-semibold uppercase">
+                  3D Three.js Graph
+                </span>
+              </div>
+              <p className="text-[11px] text-[#A0AAB5] mt-0.5">
+                Explore real-time pod, employee, brand and process database relationships in 3D space
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2 text-xs text-teal-400 font-semibold">
+            <span>{showNetworkGraph ? 'Collapse 3D Graph' : 'Inspect 3D Graph'}</span>
+            {showNetworkGraph ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </div>
+        </div>
+
+        {showNetworkGraph && (
+          <div className="h-96 relative bg-gradient-to-br from-[#0B0E12] via-[#090B0E] to-[#050505] animate-in fade-in duration-300">
+            <WorkforceNetwork totalEmployees={data?.kpis.total_employees || 32} podCount={data?.kpis.total_pods || 5} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
