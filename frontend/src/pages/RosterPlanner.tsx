@@ -268,18 +268,18 @@ export const RosterPlannerPage: React.FC = () => {
     switch (cell.status) {
       case 'WORKING':
         return cell.is_manual_override
-          ? 'bg-emerald-50 border border-emerald-300 text-emerald-900 font-semibold'
-          : 'bg-teal-50 border border-teal-200 text-teal-800 font-semibold';
+          ? 'bg-emerald-950/70 border border-emerald-500/50 text-emerald-300 font-semibold'
+          : 'bg-teal-950/70 border border-teal-500/50 text-teal-300 font-semibold';
       case 'WEEKLY_OFF':
-        return 'bg-slate-100 text-slate-400 font-medium';
+        return 'bg-[#0B0E12] border border-white/5 text-[#727E89] font-medium';
       case 'LEAVE':
-        return 'bg-amber-100 border border-amber-200 text-amber-800 font-semibold';
+        return 'bg-amber-950/70 border border-amber-500/50 text-amber-300 font-semibold';
       case 'COMP_OFF':
-        return 'bg-sky-100 border border-sky-200 text-sky-800 font-semibold';
+        return 'bg-sky-950/70 border border-sky-500/50 text-sky-300 font-semibold';
       case 'HOLIDAY':
-        return 'bg-purple-100 border border-purple-200 text-purple-800 font-semibold';
+        return 'bg-purple-950/70 border border-purple-500/50 text-purple-300 font-semibold';
       default:
-        return 'bg-slate-50 text-slate-500';
+        return 'bg-[#0B0E12] text-gray-400';
     }
   };
 
@@ -288,27 +288,27 @@ export const RosterPlannerPage: React.FC = () => {
       {/* Top Header & Actions */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-app-primaryText">Monthly Roster Planner</h1>
-          <p className="text-sm text-app-secondaryText mt-0.5">
+          <h1 className="text-2xl font-bold text-[#F5F7FA]">Monthly Roster Planner</h1>
+          <p className="text-sm text-[#A0AAB5] mt-0.5">
             Deterministic scheduling matrix. Connects 30+ employees across 10 D2C brands, pods, and process rules.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           {/* Month Navigator */}
-          <div className="inline-flex items-center space-x-1 bg-white border border-app-border rounded-xl px-2 py-1 shadow-subtle">
+          <div className="inline-flex items-center space-x-1 bg-[rgba(23,28,34,0.88)] border border-white/10 rounded-xl px-2 py-1 shadow-glass backdrop-blur-[12px]">
             <button
               onClick={handlePrevMonth}
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-white/10 text-[#A0AAB5] hover:text-white transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <div className="px-3 font-bold text-xs text-slate-800 min-w-[120px] text-center">
+            <div className="px-3 font-bold text-xs text-[#F5F7FA] min-w-[120px] text-center font-mono">
               {gridData?.month_name || `Month ${currentMonth}`} {currentYear}
             </div>
             <button
               onClick={handleNextMonth}
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-white/10 text-[#A0AAB5] hover:text-white transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -320,18 +320,18 @@ export const RosterPlannerPage: React.FC = () => {
               setSimulatorContext(null);
               setIsSimulatorOpen(true);
             }}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 hover:from-teal-100 hover:to-emerald-100 text-teal-800 font-bold text-xs shadow-subtle transition-all group"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-teal-950/60 border border-teal-800/60 hover:bg-teal-900/60 text-teal-300 font-bold text-xs shadow-sm transition-all group cursor-pointer"
           >
-            <FlaskConical className="w-4 h-4 text-teal-600 group-hover:rotate-12 transition-transform" />
+            <FlaskConical className="w-4 h-4 text-teal-400 group-hover:rotate-12 transition-transform" />
             <span>Impact Simulator</span>
           </button>
 
           {/* Audit Trail Button */}
           <button
             onClick={handleOpenAuditModal}
-            className="inline-flex items-center space-x-1.5 px-3 py-2.5 rounded-xl bg-white border border-app-border hover:bg-slate-50 text-slate-700 font-semibold text-xs shadow-subtle transition-all"
+            className="inline-flex items-center space-x-1.5 px-3 py-2.5 rounded-xl bg-[rgba(30,36,43,0.78)] border border-white/10 hover:bg-[rgba(38,46,55,0.9)] text-[#F5F7FA] font-semibold text-xs shadow-sm transition-all cursor-pointer"
           >
-            <History className="w-4 h-4 text-slate-500" />
+            <History className="w-4 h-4 text-teal-400" />
             <span>Audit Trail</span>
           </button>
 

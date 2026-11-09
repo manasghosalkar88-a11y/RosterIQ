@@ -355,21 +355,21 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
       />
 
       {/* Slide-out Drawer */}
-      <div className="fixed inset-y-0 right-0 w-full sm:max-w-2xl lg:max-w-3xl bg-white shadow-2xl z-50 border-l border-slate-200 flex flex-col transform transition-transform ease-out duration-300">
+      <div className="fixed inset-y-0 right-0 w-full sm:max-w-2xl lg:max-w-3xl bg-[rgba(23,28,34,0.96)] backdrop-blur-[20px] shadow-2xl z-50 border-l border-white/10 flex flex-col transform transition-transform ease-out duration-300 text-[#F5F7FA]">
         {/* Drawer Header */}
-        <div className="px-6 py-5 bg-app-sidebar border-b border-slate-700/60 text-white flex items-center justify-between">
+        <div className="px-6 py-5 bg-[#0B0E12] border-b border-white/10 text-white flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center shadow-inner">
+            <div className="w-10 h-10 rounded-xl bg-teal-950/60 border border-teal-500/30 flex items-center justify-center shadow-inner">
               <FlaskConical className="w-5 h-5 text-teal-400 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-lg font-bold tracking-tight">RosterIQ Impact Simulator</h2>
-                <span className="px-2 py-0.5 rounded-full bg-teal-400/20 text-teal-300 border border-teal-400/30 text-[10px] font-bold uppercase tracking-wider">
+                <h2 className="text-lg font-bold tracking-tight text-white">RosterIQ Impact Simulator</h2>
+                <span className="px-2 py-0.5 rounded-full bg-teal-950/80 text-teal-300 border border-teal-800/60 text-[10px] font-mono font-bold uppercase tracking-wider">
                   In-Memory Sandbox
                 </span>
               </div>
-              <p className="text-xs text-slate-300 mt-0.5">
+              <p className="text-xs text-[#A0AAB5] mt-0.5">
                 Deterministic what-if modeling • Zero side-effects on live roster until approved
               </p>
             </div>
@@ -377,21 +377,21 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-xl text-[#727E89] hover:text-white hover:bg-white/5 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="px-6 bg-slate-50 border-b border-slate-200 flex items-center justify-between overflow-x-auto">
+        <div className="px-6 bg-[#090B0E] border-b border-white/10 flex items-center justify-between overflow-x-auto">
           <div className="flex space-x-1 py-2">
             <button
               onClick={() => setActiveTab('configure')}
-              className={`px-3 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all ${
+              className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all ${
                 activeTab === 'configure'
-                  ? 'bg-white text-teal-700 shadow-xs border border-slate-200'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[rgba(30,36,43,0.92)] text-teal-300 shadow-sm border border-white/10'
+                  : 'text-[#A0AAB5] hover:text-white'
               }`}
             >
               <Sliders className="w-3.5 h-3.5" />
@@ -401,32 +401,32 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
             <button
               onClick={() => setActiveTab('analysis')}
               disabled={!simulationResult}
-              className={`px-3 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+              className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
                 activeTab === 'analysis'
-                  ? 'bg-white text-teal-700 shadow-xs border border-slate-200'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[rgba(30,36,43,0.92)] text-teal-300 shadow-sm border border-white/10'
+                  : 'text-[#A0AAB5] hover:text-white'
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>2. Impact Analysis</span>
               {simulationResult && (
-                <span className="w-2 h-2 rounded-full bg-teal-500 animate-ping ml-1" />
+                <span className="w-2 h-2 rounded-full bg-teal-400 animate-ping ml-1" />
               )}
             </button>
 
             <button
               onClick={() => setActiveTab('backups')}
               disabled={!simulationResult}
-              className={`px-3 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+              className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
                 activeTab === 'backups'
-                  ? 'bg-white text-teal-700 shadow-xs border border-slate-200'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[rgba(30,36,43,0.92)] text-teal-300 shadow-sm border border-white/10'
+                  : 'text-[#A0AAB5] hover:text-white'
               }`}
             >
               <UserCheck className="w-3.5 h-3.5" />
               <span>3. Smart Backups</span>
               {simulationResult?.backup_recommendations && simulationResult.backup_recommendations.length > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-teal-100 text-teal-800 text-[10px] font-bold">
+                <span className="px-1.5 py-0.2 rounded-full bg-teal-950 text-teal-300 border border-teal-800 text-[10px] font-bold">
                   {simulationResult.backup_recommendations.length}
                 </span>
               )}
@@ -434,10 +434,10 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
 
             <button
               onClick={() => setActiveTab('scenarios')}
-              className={`px-3 py-2 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all ${
+              className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all ${
                 activeTab === 'scenarios'
-                  ? 'bg-white text-teal-700 shadow-xs border border-slate-200'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[rgba(30,36,43,0.92)] text-teal-300 shadow-sm border border-white/10'
+                  : 'text-[#A0AAB5] hover:text-white'
               }`}
             >
               <Save className="w-3.5 h-3.5" />

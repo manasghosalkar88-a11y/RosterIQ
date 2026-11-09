@@ -27,12 +27,12 @@ const MainApp: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-app-primaryAccent flex items-center justify-center text-white font-bold text-2xl animate-pulse shadow-lg shadow-teal-500/20">
+      <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center space-y-4 relative z-10">
+        <div className="w-12 h-12 rounded-2xl bg-[#397C70] flex items-center justify-center text-white font-bold text-2xl animate-pulse shadow-lg shadow-teal-500/25 border border-white/10">
           R
         </div>
-        <p className="text-sm font-semibold text-gray-300 tracking-wide">
-          Loading RosterIQ Operations...
+        <p className="text-sm font-semibold text-[#A0AAB5] tracking-wider uppercase font-mono">
+          Loading RosterIQ Operations Matrix...
         </p>
       </div>
     );
@@ -43,10 +43,7 @@ const MainApp: React.FC = () => {
   }
 
   return (
-    <div className="authenticated-app min-h-screen bg-[#050505] text-white flex overflow-hidden relative selection:bg-teal-500/30 selection:text-white">
-      {/* Full-Screen 3D Topology Mesh Background (Parametric MOBIUS / WAVE / HELIX / CYLINDER) */}
-      <TopologyMesh subtle={true} />
-
+    <div className="authenticated-app min-h-screen text-[#F5F7FA] flex overflow-hidden relative selection:bg-teal-500/30 selection:text-white">
       {/* Collapsible Left Navigation Sidebar */}
       <div className="relative z-20 flex-shrink-0">
         <Sidebar
@@ -78,7 +75,7 @@ const MainApp: React.FC = () => {
           {currentModule === 'Overview' && <OverviewPage onNavigate={setCurrentModule} />}
           {currentModule === 'Settings' && <SettingsPage />}
 
-          {/* Placeholder for fallback modules */}
+          {/* Fallback for undefined routes */}
           {![
             'Overview',
             'Roster Planner',
@@ -95,17 +92,17 @@ const MainApp: React.FC = () => {
             'Notifications',
             'Settings',
           ].includes(currentModule) && (
-            <div className="bg-[#151719] rounded-enterprise border border-[#23262A] p-12 text-center shadow-card">
+            <div className="glass-card rounded-enterprise p-12 text-center shadow-card">
               <div className="w-14 h-14 rounded-2xl bg-teal-950/50 text-teal-400 flex items-center justify-center mx-auto mb-4 border border-teal-800/40">
                 <Shield className="w-7 h-7" />
               </div>
               <h3 className="text-xl font-bold text-white">{currentModule}</h3>
-              <p className="text-sm text-gray-400 max-w-md mx-auto mt-2">
-                This module connects to Approvals, Analytics, and Notifications coming in Phases 11 through 14.
+              <p className="text-sm text-[#A0AAB5] max-w-md mx-auto mt-2">
+                This module connects to Approvals, Analytics, and Notifications within RosterIQ.
               </p>
               <button
                 onClick={() => setCurrentModule('Roster Planner')}
-                className="mt-6 px-4 py-2 rounded-xl bg-app-primaryAccent text-white text-xs font-semibold shadow-md shadow-teal-500/20 hover:bg-app-primaryAccentHover transition-all"
+                className="mt-6 px-4 py-2 rounded-xl bg-[#397C70] hover:bg-[#2D6359] text-white text-xs font-semibold shadow-neumorph-btn transition-all"
               >
                 Go to Roster Planner
               </button>
@@ -120,7 +117,11 @@ const MainApp: React.FC = () => {
 export default function App() {
   return (
     <AuthProvider>
-      <MainApp />
+      <div className="relative min-h-screen bg-[#050505] text-[#F5F7FA] overflow-hidden selection:bg-teal-500/30 selection:text-white">
+        {/* Shared Full-Screen 3D Topology Mesh Background (Parametric MOBIUS / WAVE / HELIX / CYLINDER) */}
+        <TopologyMesh subtle={true} />
+        <MainApp />
+      </div>
     </AuthProvider>
   );
 }
