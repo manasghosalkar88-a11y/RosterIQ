@@ -320,10 +320,12 @@ const PaperCrumple = ({
     const initialRect = root.getBoundingClientRect();
     const initialWidth = Math.max(1, finite(width, 320));
     const initialHeight = Math.max(1, finite(height, 400));
+    const rectW = initialRect.width > 40 ? initialRect.width : (initialWidth + 40);
+    const rectH = initialRect.height > 40 ? initialRect.height : (finite(sceneHeight, 480) || initialHeight);
     const initialScale = Math.min(
       1,
-      Math.max(1, initialRect.width - 48) / initialWidth,
-      Math.max(1, initialRect.height - 48) / initialHeight
+      Math.max(1, rectW - 48) / initialWidth,
+      Math.max(1, rectH - 48) / initialHeight
     );
     root.style.setProperty('--pc-image-width', `${initialWidth * initialScale}px`);
     root.style.setProperty('--pc-image-height', `${initialHeight * initialScale}px`);
@@ -494,7 +496,7 @@ const PaperCrumple = ({
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.shadowMap.enabled = shadow;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     const amount = spring(),
       memory = spring(),
       posX = spring(),
@@ -692,11 +694,11 @@ const PaperCrumple = ({
     }
     function resize() {
       const rect = root.getBoundingClientRect();
-      viewportWidth = Math.max(1, rect.width);
-      viewportHeight = Math.max(1, rect.height);
+      viewportWidth = rect.width > 40 ? rect.width : (paperWidth + 40);
+      viewportHeight = rect.height > 40 ? rect.height : (finite(sceneHeight, 480) || paperHeight);
       scale =
         paperWidth *
-        Math.min(1, Math.max(1, viewportWidth - 48) / paperWidth, Math.max(1, viewportHeight - 48) / paperHeight);
+        Math.min(1, Math.max(1, viewportWidth - 32) / paperWidth, Math.max(1, viewportHeight - 32) / paperHeight);
       sheet.scale.setScalar(scale);
       camera.aspect = viewportWidth / viewportHeight;
       camera.position.z = viewportHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
@@ -1075,7 +1077,7 @@ const PaperCrumple = ({
     <div
       ref={rootRef}
       className={`paper-crumple ${className}`}
-      style={{ height: sceneHeight, ...style }}
+      style={{ width: '100%', maxWidth: width ? `${width + 40}px` : '380px', height: sceneHeight, ...style }}
       data-status={status}
     >
       <canvas

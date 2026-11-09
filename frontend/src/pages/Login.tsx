@@ -293,7 +293,7 @@ export const Login: React.FC = () => {
 
           {/* Interactive PaperCrumple 3D Component */}
           <div className="my-auto flex flex-col items-center justify-center w-full py-4">
-            <div className="relative group cursor-grab active:cursor-grabbing">
+            <div className="w-full max-w-[360px] flex justify-center relative group cursor-grab active:cursor-grabbing">
               <PaperCrumple
                 src="/images/rosteriq-paper-art.png"
                 alt="RosterIQ workforce operations artwork"
