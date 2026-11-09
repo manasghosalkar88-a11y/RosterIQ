@@ -34,8 +34,22 @@ export const RosterPlannerPage: React.FC = () => {
   const [processes, setProcesses] = useState<Process[]>([]);
 
   // Filters & Stakeholder Views (Company-wide, Pod-wise, Brand-wise, Process-wise, Employee-wise)
-  const [activeViewMode, setActiveViewMode] = useState<'COMPANY' | 'POD' | 'BRAND' | 'PROCESS' | 'EMPLOYEE'>('COMPANY');
-  const [selectedPodId, setSelectedPodId] = useState<string>('ALL');
+  const [activeViewMode, setActiveViewMode] = useState<'COMPANY' | 'POD' | 'BRAND' | 'PROCESS' | 'EMPLOYEE'>(() => {
+    try {
+      if (localStorage.getItem('rosteriq_selected_pod_filter')) return 'POD';
+    } catch {}
+    return 'COMPANY';
+  });
+  const [selectedPodId, setSelectedPodId] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem('rosteriq_selected_pod_filter');
+      if (saved) {
+        localStorage.removeItem('rosteriq_selected_pod_filter');
+        return saved;
+      }
+    } catch {}
+    return 'ALL';
+  });
   const [selectedBrandId, setSelectedBrandId] = useState<string>('ALL');
   const [selectedProcessId, setSelectedProcessId] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');

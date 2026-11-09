@@ -61,7 +61,7 @@ const MainApp: React.FC = () => {
           {currentModule === 'Employees' && <EmployeesPage />}
           {currentModule === 'Brands' && <BrandsPage />}
           {currentModule === 'Processes' && <ProcessesPage />}
-          {currentModule === 'Pods & Teams' && <PodsTeamsPage />}
+          {currentModule === 'Pods & Teams' && <PodsTeamsPage onNavigate={setCurrentModule} />}
           {currentModule === 'Resource Allocation' && <ResourceAllocationPage />}
           {currentModule === 'Leave & Availability' && <LeaveAvailabilityPage />}
           {currentModule === 'Holidays & Calendar' && <HolidaysCalendarPage />}
