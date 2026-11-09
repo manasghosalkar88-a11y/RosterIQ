@@ -122,12 +122,14 @@ def get_roster_grid(
     year: int,
     pod_id: Optional[int] = Query(None, description="Filter by Pod ID"),
     brand_id: Optional[int] = Query(None, description="Filter by Brand ID"),
+    process_id: Optional[int] = Query(None, description="Filter by Process ID"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
     Returns pivoted tabular roster grid (rows=Employees, cols=Days)
     with enriched shift metadata, brand/process info, and conflict tags.
+    Supports Company-wide, Pod-wise, Brand-wise, Process-wise, and Employee filtering.
     """
     roster = db.query(Roster).filter(Roster.month == month, Roster.year == year).first()
     if not roster:
@@ -165,6 +167,8 @@ def get_roster_grid(
     entries_query = db.query(RosterEntry).filter(RosterEntry.roster_id == roster.id)
     if brand_id:
         entries_query = entries_query.filter(RosterEntry.brand_id == brand_id)
+    if process_id:
+        entries_query = entries_query.filter(RosterEntry.process_id == process_id)
     entries = entries_query.all()
 
     # Index entries by (employee_id, date)
@@ -182,6 +186,11 @@ def get_roster_grid(
     if pod_id:
         emp_query = emp_query.filter(Employee.pod_id == pod_id)
     employees = emp_query.order_by(Employee.pod_id, Employee.full_name).all()
+
+    # Filter to active employees if brand or process filter is active
+    if brand_id or process_id:
+        active_emp_ids = {e.employee_id for e in entries}
+        employees = [e for e in employees if e.id in active_emp_ids]
 
     rows: List[RosterGridRow] = []
 

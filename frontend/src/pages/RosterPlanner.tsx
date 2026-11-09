@@ -7,7 +7,7 @@ import type {
   BackupRecommendation,
   AuditLogItem,
 } from '../types/roster';
-import type { Pod, Brand } from '../types/management';
+import type { Pod, Brand, Process } from '../types/management';
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
@@ -29,10 +29,13 @@ export const RosterPlannerPage: React.FC = () => {
   const [gridData, setGridData] = useState<RosterGridResponse | null>(null);
   const [pods, setPods] = useState<Pod[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [processes, setProcesses] = useState<Process[]>([]);
 
-  // Filters
+  // Filters & Stakeholder Views (Company-wide, Pod-wise, Brand-wise, Process-wise, Employee-wise)
+  const [activeViewMode, setActiveViewMode] = useState<'COMPANY' | 'POD' | 'BRAND' | 'PROCESS' | 'EMPLOYEE'>('COMPANY');
   const [selectedPodId, setSelectedPodId] = useState<string>('ALL');
   const [selectedBrandId, setSelectedBrandId] = useState<string>('ALL');
+  const [selectedProcessId, setSelectedProcessId] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
   // General States
@@ -62,6 +65,7 @@ export const RosterPlannerPage: React.FC = () => {
       const params: any = {};
       if (selectedPodId !== 'ALL') params.pod_id = Number(selectedPodId);
       if (selectedBrandId !== 'ALL') params.brand_id = Number(selectedBrandId);
+      if (selectedProcessId !== 'ALL') params.process_id = Number(selectedProcessId);
 
       const res = await api.get<RosterGridResponse>(`/roster/${currentMonth}/${currentYear}/grid`, { params });
       setGridData(res.data);
@@ -78,14 +82,16 @@ export const RosterPlannerPage: React.FC = () => {
 
   const fetchReferenceData = async () => {
     try {
-      const [podRes, brandRes] = await Promise.all([
+      const [podRes, brandRes, procRes] = await Promise.all([
         api.get<Pod[]>('/pods'),
         api.get<Brand[]>('/brands'),
+        api.get<Process[]>('/processes'),
       ]);
       setPods(podRes.data);
       setBrands(brandRes.data);
+      setProcesses(procRes.data);
     } catch (err) {
-      console.error('Failed to load pods/brands', err);
+      console.error('Failed to load pods/brands/processes', err);
     }
   };
 
@@ -95,7 +101,7 @@ export const RosterPlannerPage: React.FC = () => {
 
   useEffect(() => {
     fetchRoster();
-  }, [currentMonth, currentYear, selectedPodId, selectedBrandId]);
+  }, [currentMonth, currentYear, selectedPodId, selectedBrandId, selectedProcessId]);
 
   const handleGenerateRoster = async () => {
     setIsGenerating(true);
@@ -376,15 +382,56 @@ export const RosterPlannerPage: React.FC = () => {
         </div>
       )}
 
+      {/* Stakeholder View Selector (Company, Pod, Brand, Process, Employee) */}
+      <div className="bg-white p-3 rounded-enterprise border border-app-border shadow-subtle flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center space-x-1.5 overflow-x-auto py-0.5">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Roster Views:</span>
+          {[
+            { id: 'COMPANY', label: 'Company-Wide', desc: 'All 32 specialists' },
+            { id: 'POD', label: 'Pod-Wise', desc: 'By operational pod' },
+            { id: 'BRAND', label: 'Brand-Wise', desc: 'By D2C brand' },
+            { id: 'PROCESS', label: 'Process-Wise', desc: 'By CS, ACC, RET, NDR' },
+            { id: 'EMPLOYEE', label: 'Employee-Wise', desc: 'Individual schedule' },
+          ].map((v) => (
+            <button
+              key={v.id}
+              onClick={() => {
+                setActiveViewMode(v.id as any);
+                if (v.id === 'COMPANY') {
+                  setSelectedPodId('ALL');
+                  setSelectedBrandId('ALL');
+                  setSelectedProcessId('ALL');
+                  setSearchQuery('');
+                }
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                activeViewMode === v.id
+                  ? 'bg-teal-600 text-white shadow-xs'
+                  : 'bg-slate-50 hover:bg-slate-100 text-slate-600'
+              }`}
+            >
+              {v.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="text-[11px] text-slate-500 font-medium">
+          {gridData ? `Showing ${filteredRows.length} scheduled specialists` : 'No active roster loaded'}
+        </div>
+      </div>
+
       {/* Filters Bar */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
         <div className="relative flex-1 max-w-sm">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
             type="text"
-            placeholder="Search employee or pod..."
+            placeholder="Search employee name or code..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              if (e.target.value) setActiveViewMode('EMPLOYEE');
+            }}
             className="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-slate-50 border border-app-border focus:bg-white focus:ring-1 focus:ring-teal-500"
           />
         </div>
@@ -393,7 +440,10 @@ export const RosterPlannerPage: React.FC = () => {
           {/* Pod Filter */}
           <select
             value={selectedPodId}
-            onChange={(e) => setSelectedPodId(e.target.value)}
+            onChange={(e) => {
+              setSelectedPodId(e.target.value);
+              if (e.target.value !== 'ALL') setActiveViewMode('POD');
+            }}
             className="px-3 py-2 rounded-xl text-xs bg-white border border-app-border text-slate-700 font-medium focus:ring-1 focus:ring-teal-500"
           >
             <option value="ALL">All Operational Pods</option>
@@ -407,13 +457,33 @@ export const RosterPlannerPage: React.FC = () => {
           {/* Brand Filter */}
           <select
             value={selectedBrandId}
-            onChange={(e) => setSelectedBrandId(e.target.value)}
+            onChange={(e) => {
+              setSelectedBrandId(e.target.value);
+              if (e.target.value !== 'ALL') setActiveViewMode('BRAND');
+            }}
             className="px-3 py-2 rounded-xl text-xs bg-white border border-app-border text-slate-700 font-medium focus:ring-1 focus:ring-teal-500"
           >
             <option value="ALL">All D2C Brands</option>
             {brands.map((b) => (
               <option key={b.id} value={b.id}>
                 {b.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Process Filter */}
+          <select
+            value={selectedProcessId}
+            onChange={(e) => {
+              setSelectedProcessId(e.target.value);
+              if (e.target.value !== 'ALL') setActiveViewMode('PROCESS');
+            }}
+            className="px-3 py-2 rounded-xl text-xs bg-white border border-app-border text-slate-700 font-medium focus:ring-1 focus:ring-teal-500"
+          >
+            <option value="ALL">All Core Processes</option>
+            {processes.map((pr) => (
+              <option key={pr.id} value={pr.id}>
+                {pr.code} - {pr.name}
               </option>
             ))}
           </select>
