@@ -5,7 +5,6 @@ import { LandingPage } from './pages/Landing';
 import { Sidebar } from './components/layout/Sidebar';
 import { Navbar } from './components/layout/Navbar';
 import { TopologyMesh } from './components/3d/TopologyMesh';
-import GhostCursor from './components/reactbits/GhostCursor';
 import { EmployeesPage } from './pages/Employees';
 import { BrandsPage } from './pages/Brands';
 import { ProcessesPage } from './pages/Processes';
@@ -163,28 +162,6 @@ export default function App() {
       <div className="relative min-h-screen bg-[#050505] text-[#F5F7FA] overflow-hidden selection:bg-teal-500/30 selection:text-white">
         {/* Shared Full-Screen 3D Topology Mesh Background (Parametric MOBIUS / WAVE / HELIX / CYLINDER) */}
         <TopologyMesh subtle={false} />
-
-        {/* Global GhostCursor Smoke Trail Animation (Active across Landing, Login & All 14 App Modules) */}
-        <GhostCursor
-          color="#14B8A6"
-          size={70}
-          trailLength={35}
-          inertia={0.45}
-          turbulence={0.35}
-          drift={0.18}
-          detail={0.7}
-          brightness={0.9}
-          bloomStrength={0.45}
-          bloomRadius={1}
-          grainIntensity={0.02}
-          edgeIntensity={0}
-          clickPuff={true}
-          intro={false}
-          theme="dark"
-          mixBlendMode="screen"
-          maxDevicePixelRatio={1.5}
-          style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 40 }}
-        />
 
         <MainApp />
       </div>
