@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Login } from './pages/Login';
+import { LandingPage } from './pages/Landing';
 import { Sidebar } from './components/layout/Sidebar';
 import { Navbar } from './components/layout/Navbar';
 import { TopologyMesh } from './components/3d/TopologyMesh';
+import GhostCursor from './components/reactbits/GhostCursor';
 import { EmployeesPage } from './pages/Employees';
 import { BrandsPage } from './pages/Brands';
 import { ProcessesPage } from './pages/Processes';
@@ -24,11 +26,30 @@ const MainApp: React.FC = () => {
   const { user, token, isLoading } = useAuth();
   const [currentModule, setCurrentModule] = useState('Overview');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [publicView, setPublicView] = useState<'landing' | 'login'>(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#login') {
+      return 'login';
+    }
+    return 'landing';
+  });
+
+  // Sync hash changes for direct deep linking (#login or #landing)
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#login') {
+        setPublicView('login');
+      } else if (window.location.hash === '#landing' || !window.location.hash) {
+        setPublicView('landing');
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center space-y-4 relative z-10">
-        <div className="w-12 h-12 rounded-2xl bg-[#397C70] flex items-center justify-center text-white font-bold text-2xl animate-pulse shadow-lg shadow-teal-500/25 border border-white/10">
+        <div className="w-12 h-12 rounded-2xl bg-[#14B8A6] flex items-center justify-center text-white font-bold text-2xl animate-pulse shadow-lg shadow-teal-500/25 border border-white/10">
           R
         </div>
         <p className="text-sm font-semibold text-[#A0AAB5] tracking-wider uppercase font-mono">
@@ -38,10 +59,32 @@ const MainApp: React.FC = () => {
     );
   }
 
+  // Unauthenticated State: Route between New Public Landing Page and Login Page
   if (!token || !user) {
-    return <Login />;
+    if (publicView === 'login') {
+      return (
+        <Login
+          onBackToLanding={() => {
+            window.location.hash = '';
+            setPublicView('landing');
+          }}
+        />
+      );
+    }
+    return (
+      <div className="relative z-10 min-h-screen h-screen overflow-y-auto">
+        <LandingPage
+          onLogin={() => {
+            window.location.hash = '#login';
+            setPublicView('login');
+          }}
+          isAuthenticated={false}
+        />
+      </div>
+    );
   }
 
+  // Authenticated State: Full RosterIQ Operations Suite
   return (
     <div className="authenticated-app min-h-screen text-[#F5F7FA] flex overflow-hidden relative selection:bg-teal-500/30 selection:text-white">
       {/* Collapsible Left Navigation Sidebar */}
@@ -102,7 +145,7 @@ const MainApp: React.FC = () => {
               </p>
               <button
                 onClick={() => setCurrentModule('Roster Planner')}
-                className="mt-6 px-4 py-2 rounded-xl bg-[#397C70] hover:bg-[#2D6359] text-white text-xs font-semibold shadow-neumorph-btn transition-all"
+                className="btn-primary mt-6 px-4 py-2 text-xs"
               >
                 Go to Roster Planner
               </button>
@@ -120,6 +163,29 @@ export default function App() {
       <div className="relative min-h-screen bg-[#050505] text-[#F5F7FA] overflow-hidden selection:bg-teal-500/30 selection:text-white">
         {/* Shared Full-Screen 3D Topology Mesh Background (Parametric MOBIUS / WAVE / HELIX / CYLINDER) */}
         <TopologyMesh subtle={false} />
+
+        {/* Global GhostCursor Smoke Trail Animation (Active across Landing, Login & All 14 App Modules) */}
+        <GhostCursor
+          color="#14B8A6"
+          size={70}
+          trailLength={35}
+          inertia={0.45}
+          turbulence={0.35}
+          drift={0.18}
+          detail={0.7}
+          brightness={0.9}
+          bloomStrength={0.45}
+          bloomRadius={1}
+          grainIntensity={0.02}
+          edgeIntensity={0}
+          clickPuff={true}
+          intro={false}
+          theme="dark"
+          mixBlendMode="screen"
+          maxDevicePixelRatio={1.5}
+          style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 40 }}
+        />
+
         <MainApp />
       </div>
     </AuthProvider>

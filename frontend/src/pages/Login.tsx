@@ -6,13 +6,18 @@ import {
   Sparkles,
   AlertCircle,
   ArrowRight,
+  ArrowLeft,
   CheckCircle2,
   Lock,
   Mail,
   HelpCircle,
 } from 'lucide-react';
 
-export const Login: React.FC = () => {
+export interface LoginProps {
+  onBackToLanding?: () => void;
+}
+
+export const Login: React.FC<LoginProps> = ({ onBackToLanding }) => {
   const { login, seedUsers } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -168,6 +173,17 @@ export const Login: React.FC = () => {
           }`}
         >
           <div className="w-full max-w-[460px] bg-[rgba(23,28,34,0.92)] backdrop-blur-[18px] border border-white/12 rounded-2xl shadow-[0_16px_36px_-4px_rgba(0,0,0,0.7),0_6px_12px_-2px_rgba(0,0,0,0.5)] p-6 sm:p-7 pointer-events-auto select-auto">
+            {onBackToLanding && (
+              <button
+                type="button"
+                onClick={onBackToLanding}
+                className="mb-4 text-xs font-medium text-[#94A3B8] hover:text-[#2DD4BF] flex items-center space-x-1.5 transition-colors group"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+                <span>Back to Platform Overview</span>
+              </button>
+            )}
+
             {/* Form Header */}
             <div className="text-center mb-5">
               <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-[#397C70] text-white font-bold text-xl shadow-md shadow-teal-500/25 border border-white/10 mb-2">
