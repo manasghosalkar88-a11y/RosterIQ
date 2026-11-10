@@ -108,19 +108,19 @@ export const LeaveAvailabilityPage: React.FC = () => {
   const approvedCount = leaves.filter((l) => l.status === 'APPROVED').length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-fade">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-app-primaryText">Leave & Availability Management</h1>
-          <p className="text-sm text-app-secondaryText mt-0.5">
+          <h1 className="text-2xl font-black text-[#F8FAFC] tracking-tight">Leave & Availability Management</h1>
+          <p className="text-sm text-[#94A3B8] mt-0.5">
             Planned time-off, comp-off credits, and approval workflows affecting roster scheduling.
           </p>
         </div>
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-app-primaryAccent hover:bg-app-primaryAccentHover text-white font-medium text-sm shadow-md shadow-teal-500/20 transition-all"
+          className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl btn-primary text-xs font-semibold"
         >
           <Plus className="w-4 h-4" />
           <span>Apply for Leave</span>
@@ -128,58 +128,58 @@ export const LeaveAvailabilityPage: React.FC = () => {
       </div>
 
       {notification && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center space-x-2.5 shadow-subtle">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+        <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-sm flex items-center space-x-2.5 shadow-subtle animate-toast">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
           <span>{notification}</span>
         </div>
       )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Total Leave Requests</div>
-          <div className="text-2xl font-bold text-app-primaryText mt-1">{leaves.length}</div>
-          <div className="text-[11px] text-app-secondaryText mt-0.5">Logged in system</div>
+        <div className="kpi-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Total Leave Requests</div>
+          <div className="text-2xl font-black text-[#F8FAFC] mt-1">{leaves.length}</div>
+          <div className="text-[11px] text-[#94A3B8] mt-0.5">Logged in system</div>
         </div>
 
-        <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Pending Approvals</div>
-          <div className="text-2xl font-bold text-amber-600 mt-1">{pendingCount}</div>
-          <div className="text-[11px] text-amber-700 font-medium mt-0.5">Requires manager review</div>
+        <div className="kpi-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Pending Approvals</div>
+          <div className="text-2xl font-black text-amber-400 mt-1">{pendingCount}</div>
+          <div className="text-[11px] text-amber-400 font-medium mt-0.5">Requires manager review</div>
         </div>
 
-        <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Approved Time-Off</div>
-          <div className="text-2xl font-bold text-emerald-600 mt-1">{approvedCount}</div>
-          <div className="text-[11px] text-emerald-700 font-medium mt-0.5">Blocks roster generation</div>
+        <div className="kpi-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Approved Time-Off</div>
+          <div className="text-2xl font-black text-emerald-400 mt-1">{approvedCount}</div>
+          <div className="text-[11px] text-emerald-400 font-medium mt-0.5">Blocks roster generation</div>
         </div>
 
-        <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Comp-Off Credits</div>
-          <div className="text-2xl font-bold text-blue-600 mt-1">{compOffs.length}</div>
-          <div className="text-[11px] text-blue-700 font-medium mt-0.5">Earned from holiday/Sunday shifts</div>
+        <div className="kpi-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Comp-Off Credits</div>
+          <div className="text-2xl font-black text-blue-400 mt-1">{compOffs.length}</div>
+          <div className="text-[11px] text-[#2DD4BF] font-medium mt-0.5">Earned from holiday/Sunday shifts</div>
         </div>
       </div>
 
       {/* Tabs & Filters */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-app-border pb-2">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-[rgba(148,163,184,0.16)] pb-2">
         <div className="flex space-x-2">
           <button
             onClick={() => setActiveTab('LEAVES')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold tab-transition ${
               activeTab === 'LEAVES'
-                ? 'bg-app-sidebar text-white shadow-sm'
-                : 'bg-white text-slate-600 border border-app-border hover:bg-slate-50'
+                ? 'bg-[#14B8A6] text-white shadow-md shadow-teal-500/20'
+                : 'bg-[#111820] text-[#94A3B8] border border-[rgba(148,163,184,0.16)] hover:text-[#F8FAFC]'
             }`}
           >
             Leave Requests ({leaves.length})
           </button>
           <button
             onClick={() => setActiveTab('COMPOFFS')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold tab-transition ${
               activeTab === 'COMPOFFS'
-                ? 'bg-app-sidebar text-white shadow-sm'
-                : 'bg-white text-slate-600 border border-app-border hover:bg-slate-50'
+                ? 'bg-[#14B8A6] text-white shadow-md shadow-teal-500/20'
+                : 'bg-[#111820] text-[#94A3B8] border border-[rgba(148,163,184,0.16)] hover:text-[#F8FAFC]'
             }`}
           >
             Comp-Off Balances ({compOffs.length})
@@ -187,27 +187,27 @@ export const LeaveAvailabilityPage: React.FC = () => {
         </div>
 
         {activeTab === 'LEAVES' && (
-          <div className="inline-flex rounded-xl bg-slate-100 p-1 text-xs font-medium">
+          <div className="inline-flex rounded-xl bg-[#080D12] p-1 text-xs font-medium border border-[rgba(148,163,184,0.14)]">
             <button
               onClick={() => setStatusFilter('ALL')}
-              className={`px-3 py-1 rounded-lg ${
-                statusFilter === 'ALL' ? 'bg-white shadow-sm font-bold text-slate-800' : 'text-slate-600'
+              className={`px-3 py-1 rounded-lg transition-all ${
+                statusFilter === 'ALL' ? 'bg-[#151D25] shadow-sm font-bold text-[#F8FAFC]' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
               }`}
             >
               All
             </button>
             <button
               onClick={() => setStatusFilter('PENDING')}
-              className={`px-3 py-1 rounded-lg ${
-                statusFilter === 'PENDING' ? 'bg-amber-500 text-white font-bold' : 'text-slate-600'
+              className={`px-3 py-1 rounded-lg transition-all ${
+                statusFilter === 'PENDING' ? 'bg-amber-950/60 text-amber-300 font-bold border border-amber-500/40' : 'text-[#94A3B8] hover:text-amber-300'
               }`}
             >
               Pending ({pendingCount})
             </button>
             <button
               onClick={() => setStatusFilter('APPROVED')}
-              className={`px-3 py-1 rounded-lg ${
-                statusFilter === 'APPROVED' ? 'bg-emerald-600 text-white font-bold' : 'text-slate-600'
+              className={`px-3 py-1 rounded-lg transition-all ${
+                statusFilter === 'APPROVED' ? 'bg-emerald-950/60 text-emerald-300 font-bold border border-emerald-500/40' : 'text-[#94A3B8] hover:text-emerald-300'
               }`}
             >
               Approved ({approvedCount})
@@ -350,17 +350,17 @@ export const LeaveAvailabilityPage: React.FC = () => {
 
       {/* Submit Leave Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-app-border max-w-md w-full p-6 shadow-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-app-primaryText">Submit Planned Leave Request</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-card-deep rounded-2xl border border-[rgba(148,163,184,0.22)] max-w-md w-full p-6 shadow-elevated animate-modal">
+            <div className="flex items-center justify-between mb-4 border-b border-[rgba(148,163,184,0.16)] pb-3">
+              <h3 className="text-base font-bold text-[#F8FAFC]">Submit Planned Leave Request</h3>
+              <button onClick={() => setIsModalOpen(false)} className="text-[#94A3B8] hover:text-[#F8FAFC] transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {modalError && (
-              <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center space-x-2">
+              <div className="mb-4 p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-xs flex items-center space-x-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <span>{modalError}</span>
               </div>
@@ -368,11 +368,11 @@ export const LeaveAvailabilityPage: React.FC = () => {
 
             <form onSubmit={handleSubmitLeave} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-600 font-semibold mb-1">Select Employee *</label>
+                <label className="block text-[#CBD5E1] font-semibold mb-1">Select Employee *</label>
                 <select
                   value={selectedEmpId}
                   onChange={(e) => setSelectedEmpId(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-xl border border-app-border focus:ring-1 focus:ring-teal-500"
+                  className="w-full px-3 py-2 rounded-xl bg-[#080D12] border border-[rgba(148,163,184,0.22)] text-[#F8FAFC] focus:border-[#14B8A6]"
                   required
                 >
                   {employees.map((e) => (
@@ -384,11 +384,11 @@ export const LeaveAvailabilityPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-600 font-semibold mb-1">Leave Type *</label>
+                <label className="block text-[#CBD5E1] font-semibold mb-1">Leave Type *</label>
                 <select
                   value={leaveType}
                   onChange={(e) => setLeaveType(e.target.value as LeaveType)}
-                  className="w-full px-3 py-2 rounded-xl border border-app-border focus:ring-1 focus:ring-teal-500"
+                  className="w-full px-3 py-2 rounded-xl bg-[#080D12] border border-[rgba(148,163,184,0.22)] text-[#F8FAFC] focus:border-[#14B8A6]"
                 >
                   <option value="PLANNED">Planned Leave</option>
                   <option value="CASUAL">Casual Leave</option>
@@ -400,49 +400,49 @@ export const LeaveAvailabilityPage: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-600 font-semibold mb-1">Start Date *</label>
+                  <label className="block text-[#CBD5E1] font-semibold mb-1">Start Date *</label>
                   <input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-app-border focus:ring-1 focus:ring-teal-500"
+                    className="w-full px-3 py-2 rounded-xl bg-[#080D12] border border-[rgba(148,163,184,0.22)] text-[#F8FAFC] focus:border-[#14B8A6]"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 font-semibold mb-1">End Date *</label>
+                  <label className="block text-[#CBD5E1] font-semibold mb-1">End Date *</label>
                   <input
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-app-border focus:ring-1 focus:ring-teal-500"
+                    className="w-full px-3 py-2 rounded-xl bg-[#080D12] border border-[rgba(148,163,184,0.22)] text-[#F8FAFC] focus:border-[#14B8A6]"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-600 font-semibold mb-1">Reason</label>
+                <label className="block text-[#CBD5E1] font-semibold mb-1">Reason</label>
                 <textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="Provide context or family event details..."
                   rows={2}
-                  className="w-full px-3 py-2 rounded-xl border border-app-border focus:ring-1 focus:ring-teal-500"
+                  className="w-full px-3 py-2 rounded-xl bg-[#080D12] border border-[rgba(148,163,184,0.22)] text-[#F8FAFC] placeholder-[#64748B] focus:border-[#14B8A6]"
                 />
               </div>
 
-              <div className="pt-3 border-t border-app-border flex justify-end space-x-2">
+              <div className="pt-3 border-t border-[rgba(148,163,184,0.16)] flex justify-end space-x-2">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium"
+                  className="btn-secondary px-3 py-2 rounded-xl text-xs font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-app-primaryAccent hover:bg-app-primaryAccentHover text-white font-semibold"
+                  className="btn-primary px-4 py-2 rounded-xl text-xs font-semibold"
                 >
                   Submit Request
                 </button>

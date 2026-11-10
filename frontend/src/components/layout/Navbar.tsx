@@ -35,11 +35,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentModule }) => {
   };
 
   return (
-    <header className="h-16 bg-[rgba(23,28,34,0.88)] backdrop-blur-[14px] border-b border-white/10 px-6 flex items-center justify-between sticky top-0 z-30 shadow-glass select-none">
+    <header className="h-16 bg-[#0B1016]/90 backdrop-blur-[14px] border-b border-[rgba(148,163,184,0.16)] px-6 flex items-center justify-between sticky top-0 z-30 shadow-glass select-none">
       {/* Left: Module Title & Breadcrumbs */}
       <div className="flex items-center space-x-3">
-        <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">{currentModule}</h2>
-        <span className="text-xs text-[#727E89] hidden lg:inline font-mono">
+        <h2 className="text-base sm:text-lg font-extrabold text-[#F8FAFC] tracking-tight">{currentModule}</h2>
+        <span className="text-xs text-[#94A3B8] hidden lg:inline font-mono">
           · DataStraw Operations Matrix
         </span>
       </div>
@@ -47,7 +47,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentModule }) => {
       {/* Center: Inset Search Bar */}
       <div className="hidden md:flex items-center max-w-sm w-full mx-4">
         <div className="relative w-full">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#64748B]">
             <Search className="w-3.5 h-3.5" />
           </div>
           <input
@@ -55,10 +55,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentModule }) => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Quick search specialists, brands, shifts..."
-            className="w-full pl-9 pr-14 py-1.5 rounded-xl bg-[#0B0E12] border border-white/10 text-white placeholder-gray-500 text-xs focus:outline-none focus:ring-1 focus:ring-[#397C70] shadow-neumorph-inset transition-all"
+            className="w-full pl-9 pr-14 py-1.5 rounded-xl bg-[#111820] border border-[rgba(148,163,184,0.18)] text-[#F8FAFC] placeholder-[#64748B] text-xs focus:outline-none focus:border-[#14B8A6] focus:ring-1 focus:ring-[#14B8A6] shadow-inner transition-all duration-150"
           />
           <div className="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
-            <kbd className="px-1.5 py-0.5 text-[9px] font-mono text-gray-400 bg-white/5 border border-white/10 rounded">
+            <kbd className="px-1.5 py-0.5 text-[9px] font-mono text-[#94A3B8] bg-white/5 border border-white/10 rounded">
               ⌘K
             </kbd>
           </div>
@@ -68,14 +68,14 @@ export const Navbar: React.FC<NavbarProps> = ({ currentModule }) => {
       {/* Right Controls: Live Status, Shift Date, Role Switcher, Notifications, Profile */}
       <div className="flex items-center space-x-3">
         {/* Live Status Pill */}
-        <div className="hidden xl:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-teal-950/60 border border-teal-800/60 text-[10px] font-mono text-teal-300">
-          <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+        <div className="hidden xl:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-teal-950/70 border border-teal-800/60 text-[10px] font-mono text-[#2DD4BF]">
+          <span className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse" />
           <span className="tracking-wider uppercase font-semibold">SYSTEM OPTIMAL</span>
         </div>
 
         {/* Current Shift Pill */}
-        <div className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-[#0B0E12] border border-white/10 text-[10px] font-mono text-[#A0AAB5]">
-          <Calendar className="w-3 h-3 text-teal-400" />
+        <div className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-[#111820] border border-[rgba(148,163,184,0.16)] text-[10px] font-mono text-[#CBD5E1]">
+          <Calendar className="w-3 h-3 text-[#14B8A6]" />
           <span>Nov 2026 · Cycle A</span>
         </div>
 
@@ -83,7 +83,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentModule }) => {
         <div className="relative">
           <button
             onClick={() => setShowRoleMenu(!showRoleMenu)}
-            className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all ${badge.bg}`}
+            className={`inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all duration-150 hover:brightness-110 ${badge.bg}`}
             title="Click to simulate switching user roles"
           >
             <Shield className="w-3.5 h-3.5" />
@@ -92,8 +92,8 @@ export const Navbar: React.FC<NavbarProps> = ({ currentModule }) => {
           </button>
 
           {showRoleMenu && (
-            <div className="absolute right-0 mt-2 w-56 bg-[rgba(23,28,34,0.95)] backdrop-blur-[16px] rounded-2xl shadow-elevated border border-white/12 py-2 z-50 text-xs animate-in fade-in duration-150">
-              <div className="px-3 py-1.5 font-semibold text-[#A0AAB5] border-b border-white/10 text-[11px]">
+            <div className="absolute right-0 mt-2 w-56 bg-[#141A21] backdrop-blur-[16px] rounded-2xl shadow-elevated border border-[rgba(148,163,184,0.20)] py-2 z-50 text-xs animate-dropdown">
+              <div className="px-3 py-1.5 font-semibold text-[#94A3B8] border-b border-[rgba(148,163,184,0.16)] text-[11px]">
                 Simulate Role (Instant Switch)
               </div>
               <button
@@ -102,7 +102,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentModule }) => {
               >
                 <div>
                   <div className="font-semibold text-purple-400">Super Admin</div>
-                  <div className="text-[10px] text-gray-400">Full system & company settings</div>
+                  <div className="text-[10px] text-[#94A3B8]">Full system & company settings</div>
                 </div>
                 {user?.role === 'SUPER_ADMIN' && <UserCheck className="w-4 h-4 text-purple-400" />}
               </button>
@@ -111,10 +111,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentModule }) => {
                 className="w-full text-left px-3 py-2 hover:bg-white/5 flex items-center justify-between transition-colors"
               >
                 <div>
-                  <div className="font-semibold text-teal-400">Operations Manager</div>
-                  <div className="text-[10px] text-gray-400">Rosters, assignments & publishing</div>
+                  <div className="font-semibold text-[#2DD4BF]">Operations Manager</div>
+                  <div className="text-[10px] text-[#94A3B8]">Rosters, assignments & publishing</div>
                 </div>
-                {user?.role === 'OPS_MANAGER' && <UserCheck className="w-4 h-4 text-teal-400" />}
+                {user?.role === 'OPS_MANAGER' && <UserCheck className="w-4 h-4 text-[#2DD4BF]" />}
               </button>
               <button
                 onClick={() => handleQuickSwitch('lead@datastraw.io', 'Lead@123')}
@@ -122,7 +122,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentModule }) => {
               >
                 <div>
                   <div className="font-semibold text-blue-400">Pod Lead</div>
-                  <div className="text-[10px] text-gray-400">Pod schedules & roster reviews</div>
+                  <div className="text-[10px] text-[#94A3B8]">Pod schedules & roster reviews</div>
                 </div>
                 {user?.role === 'POD_LEAD' && <UserCheck className="w-4 h-4 text-blue-400" />}
               </button>
@@ -131,10 +131,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentModule }) => {
                 className="w-full text-left px-3 py-2 hover:bg-white/5 flex items-center justify-between transition-colors"
               >
                 <div>
-                  <div className="font-semibold text-sky-400">Employee</div>
-                  <div className="text-[10px] text-gray-400">Personal schedule & leaves</div>
+                  <div className="font-semibold text-cyan-400">Employee</div>
+                  <div className="text-[10px] text-[#94A3B8]">Personal schedule & leaves</div>
                 </div>
-                {user?.role === 'EMPLOYEE' && <UserCheck className="w-4 h-4 text-sky-400" />}
+                {user?.role === 'EMPLOYEE' && <UserCheck className="w-4 h-4 text-cyan-400" />}
               </button>
             </div>
           )}
@@ -142,26 +142,26 @@ export const Navbar: React.FC<NavbarProps> = ({ currentModule }) => {
 
         {/* Notifications Icon */}
         <button
-          className="relative p-2 rounded-xl text-[#A0AAB5] hover:text-white hover:bg-white/5 transition-colors border border-white/5"
+          className="relative p-2 rounded-xl text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-white/5 transition-colors border border-[rgba(148,163,184,0.16)]"
           title="Notifications"
         >
           <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-teal-400 shadow-sm shadow-teal-400/50" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#14B8A6] shadow-sm shadow-teal-400/50" />
         </button>
 
         {/* User Profile */}
-        <div className="flex items-center space-x-2.5 pl-2 border-l border-white/10">
-          <div className="w-8 h-8 rounded-full bg-[#0B0E12] text-teal-400 font-bold text-xs flex items-center justify-center border border-white/10 shadow-sm">
+        <div className="flex items-center space-x-2.5 pl-2 border-l border-[rgba(148,163,184,0.16)]">
+          <div className="w-8 h-8 rounded-full bg-[#111820] text-[#14B8A6] font-bold text-xs flex items-center justify-center border border-[rgba(148,163,184,0.18)] shadow-sm">
             {user?.full_name?.charAt(0) || 'U'}
           </div>
           <div className="hidden lg:block text-left">
-            <div className="text-xs font-semibold text-white leading-none">{user?.full_name}</div>
-            <div className="text-[10px] text-[#A0AAB5] mt-0.5 leading-none">{user?.email}</div>
+            <div className="text-xs font-semibold text-[#F8FAFC] leading-none">{user?.full_name}</div>
+            <div className="text-[10px] text-[#94A3B8] mt-0.5 leading-none">{user?.email}</div>
           </div>
 
           <button
             onClick={logout}
-            className="p-1.5 text-[#727E89] hover:text-rose-400 rounded-lg hover:bg-rose-950/30 transition-colors"
+            className="p-1.5 text-[#94A3B8] hover:text-rose-400 rounded-lg hover:bg-rose-950/30 transition-colors"
             title="Log out"
           >
             <LogOut className="w-4 h-4" />

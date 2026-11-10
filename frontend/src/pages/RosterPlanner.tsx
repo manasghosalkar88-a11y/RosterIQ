@@ -268,47 +268,47 @@ export const RosterPlannerPage: React.FC = () => {
     switch (cell.status) {
       case 'WORKING':
         return cell.is_manual_override
-          ? 'bg-emerald-950/70 border border-emerald-500/50 text-emerald-300 font-semibold'
-          : 'bg-teal-950/70 border border-teal-500/50 text-teal-300 font-semibold';
+          ? 'bg-emerald-950/80 border border-emerald-400/50 text-emerald-300 font-bold'
+          : 'bg-teal-950/80 border border-teal-500/50 text-[#2DD4BF] font-semibold';
       case 'WEEKLY_OFF':
-        return 'bg-[#0B0E12] border border-white/5 text-[#727E89] font-medium';
+        return 'bg-[#080D12] border border-white/5 text-[#64748B] font-medium';
       case 'LEAVE':
-        return 'bg-amber-950/70 border border-amber-500/50 text-amber-300 font-semibold';
+        return 'bg-amber-950/80 border border-amber-400/50 text-amber-300 font-bold';
       case 'COMP_OFF':
-        return 'bg-sky-950/70 border border-sky-500/50 text-sky-300 font-semibold';
+        return 'bg-cyan-950/80 border border-cyan-400/50 text-cyan-300 font-bold';
       case 'HOLIDAY':
-        return 'bg-purple-950/70 border border-purple-500/50 text-purple-300 font-semibold';
+        return 'bg-purple-950/80 border border-purple-400/50 text-purple-300 font-bold';
       default:
-        return 'bg-[#0B0E12] text-gray-400';
+        return 'bg-[#080D12] text-[#64748B]';
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-fade">
       {/* Top Header & Actions */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#F5F7FA]">Monthly Roster Planner</h1>
-          <p className="text-sm text-[#A0AAB5] mt-0.5">
+          <h1 className="text-2xl font-black text-[#F8FAFC] tracking-tight">Monthly Roster Planner</h1>
+          <p className="text-sm text-[#94A3B8] mt-0.5">
             Deterministic scheduling matrix. Connects 30+ employees across 10 D2C brands, pods, and process rules.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           {/* Month Navigator */}
-          <div className="inline-flex items-center space-x-1 bg-[rgba(23,28,34,0.88)] border border-white/10 rounded-xl px-2 py-1 shadow-glass backdrop-blur-[12px]">
+          <div className="inline-flex items-center space-x-1 bg-[#111820] border border-[rgba(148,163,184,0.16)] rounded-xl px-2 py-1 shadow-glass backdrop-blur-[14px]">
             <button
               onClick={handlePrevMonth}
-              className="p-1.5 rounded-lg hover:bg-white/10 text-[#A0AAB5] hover:text-white transition-colors"
+              className="p-1.5 rounded-lg hover:bg-white/10 text-[#94A3B8] hover:text-[#F8FAFC] transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <div className="px-3 font-bold text-xs text-[#F5F7FA] min-w-[120px] text-center font-mono">
+            <div className="px-3 font-bold text-xs text-[#F8FAFC] min-w-[120px] text-center font-mono">
               {gridData?.month_name || `Month ${currentMonth}`} {currentYear}
             </div>
             <button
               onClick={handleNextMonth}
-              className="p-1.5 rounded-lg hover:bg-white/10 text-[#A0AAB5] hover:text-white transition-colors"
+              className="p-1.5 rounded-lg hover:bg-white/10 text-[#94A3B8] hover:text-[#F8FAFC] transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -320,18 +320,18 @@ export const RosterPlannerPage: React.FC = () => {
               setSimulatorContext(null);
               setIsSimulatorOpen(true);
             }}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-teal-950/60 border border-teal-800/60 hover:bg-teal-900/60 text-teal-300 font-bold text-xs shadow-sm transition-all group cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-teal-950/70 border border-teal-800/60 hover:bg-teal-900/70 text-[#2DD4BF] font-bold text-xs shadow-sm transition-all duration-150 hover:-translate-y-0.5 group cursor-pointer"
           >
-            <FlaskConical className="w-4 h-4 text-teal-400 group-hover:rotate-12 transition-transform" />
+            <FlaskConical className="w-4 h-4 text-[#14B8A6] group-hover:rotate-12 transition-transform" />
             <span>Impact Simulator</span>
           </button>
 
           {/* Audit Trail Button */}
           <button
             onClick={handleOpenAuditModal}
-            className="inline-flex items-center space-x-1.5 px-3 py-2.5 rounded-xl bg-[rgba(30,36,43,0.78)] border border-white/10 hover:bg-[rgba(38,46,55,0.9)] text-[#F5F7FA] font-semibold text-xs shadow-sm transition-all cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3 py-2.5 rounded-xl bg-[#151D25] border border-[rgba(148,163,184,0.18)] hover:bg-[#1E2732] text-[#F8FAFC] font-semibold text-xs shadow-sm transition-all duration-150 hover:-translate-y-0.5 cursor-pointer"
           >
-            <History className="w-4 h-4 text-teal-400" />
+            <History className="w-4 h-4 text-[#14B8A6]" />
             <span>Audit Trail</span>
           </button>
 
@@ -339,7 +339,7 @@ export const RosterPlannerPage: React.FC = () => {
           <button
             onClick={handleGenerateRoster}
             disabled={isGenerating}
-            className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-app-primaryAccent hover:bg-app-primaryAccentHover text-white font-semibold text-xs shadow-md shadow-teal-500/20 transition-all disabled:opacity-50"
+            className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#14B8A6] hover:bg-[#0D9488] text-white font-bold text-xs shadow-md shadow-teal-500/25 transition-all duration-150 hover:-translate-y-0.5 disabled:opacity-50"
           >
             <Play className={`w-3.5 h-3.5 fill-current ${isGenerating ? 'animate-spin' : ''}`} />
             <span>{isGenerating ? 'Generating Engine...' : 'Generate Roster'}</span>
@@ -349,16 +349,16 @@ export const RosterPlannerPage: React.FC = () => {
             <button
               onClick={handlePublishRoster}
               disabled={isPublishing}
-              className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-app-sidebar hover:bg-slate-800 text-white font-semibold text-xs shadow-xs transition-all disabled:opacity-50"
+              className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#172B4D] hover:bg-[#29466B] border border-[rgba(148,163,184,0.18)] text-white font-semibold text-xs shadow-xs transition-all duration-150 hover:-translate-y-0.5 disabled:opacity-50"
             >
-              <Send className="w-3.5 h-3.5 text-teal-400" />
+              <Send className="w-3.5 h-3.5 text-[#2DD4BF]" />
               <span>{isPublishing ? 'Publishing...' : 'Publish Roster'}</span>
             </button>
           )}
 
           {gridData && gridData.status === 'PUBLISHED' && (
-            <span className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
-              <CheckCircle2 className="w-4 h-4" />
+            <span className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl bg-emerald-950/70 text-emerald-300 border border-emerald-800/60 text-xs font-bold">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
               <span>Roster Published</span>
             </span>
           )}
@@ -366,65 +366,65 @@ export const RosterPlannerPage: React.FC = () => {
       </div>
 
       {notification && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center space-x-2.5 shadow-subtle">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+        <div className="p-4 rounded-xl bg-emerald-950/70 border border-emerald-800/60 text-emerald-300 text-sm flex items-center space-x-2.5 shadow-glass animate-toast">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
           <span>{notification}</span>
         </div>
       )}
 
-      {/* KPI Stats Bar */}
+      {/* KPI Stats Bar (Section 7) */}
       {gridData && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-            <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Operational Coverage</div>
+          <div className="kpi-card p-4">
+            <div className="text-xs font-bold uppercase tracking-wider text-[#CBD5E1]">Operational Coverage</div>
             <div className="flex items-baseline space-x-2 mt-1">
-              <span className={`text-2xl font-bold ${gridData.coverage_percentage >= 90 ? 'text-emerald-600' : 'text-amber-600'}`}>
+              <span className={`text-2xl font-black ${gridData.coverage_percentage >= 90 ? 'text-[#2DD4BF]' : 'text-amber-400'}`}>
                 {gridData.coverage_percentage}%
               </span>
-              <span className="text-[11px] text-slate-400">of demand slots met</span>
+              <span className="text-[11px] text-[#94A3B8]">of demand slots met</span>
             </div>
-            <div className="w-full bg-slate-100 rounded-full h-1.5 mt-2">
+            <div className="w-full bg-[#080D12] rounded-full h-1.5 mt-2 border border-white/5">
               <div
-                className={`h-1.5 rounded-full ${gridData.coverage_percentage >= 90 ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                className={`h-1.5 rounded-full ${gridData.coverage_percentage >= 90 ? 'bg-[#14B8A6]' : 'bg-amber-400'}`}
                 style={{ width: `${Math.min(100, gridData.coverage_percentage)}%` }}
               />
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-            <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Fairness Index</div>
+          <div className="kpi-card p-4">
+            <div className="text-xs font-bold uppercase tracking-wider text-[#CBD5E1]">Fairness Index</div>
             <div className="flex items-baseline space-x-2 mt-1">
-              <span className="text-2xl font-bold text-teal-600">{gridData.fairness_score}</span>
-              <span className="text-[11px] text-slate-400">/ 100</span>
+              <span className="text-2xl font-black text-[#2DD4BF]">{gridData.fairness_score}</span>
+              <span className="text-[11px] text-[#94A3B8]">/ 100</span>
             </div>
-            <div className="text-[11px] text-slate-500 mt-1">Weekend shift distribution balance</div>
+            <div className="text-[11px] text-[#94A3B8] mt-1">Weekend shift distribution balance</div>
           </div>
 
-          <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-            <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Unresolved Conflicts</div>
+          <div className="kpi-card p-4">
+            <div className="text-xs font-bold uppercase tracking-wider text-[#CBD5E1]">Unresolved Conflicts</div>
             <div className="flex items-baseline space-x-2 mt-1">
-              <span className={`text-2xl font-bold ${gridData.total_conflicts > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+              <span className={`text-2xl font-black ${gridData.total_conflicts > 0 ? 'text-[#F43F5E]' : 'text-[#22C55E]'}`}>
                 {gridData.total_conflicts}
               </span>
-              <span className="text-[11px] text-slate-400">flagged gaps</span>
+              <span className="text-[11px] text-[#94A3B8]">flagged gaps</span>
             </div>
-            <div className="text-[11px] text-rose-600 font-medium mt-1">
+            <div className="text-[11px] text-[#F43F5E] font-medium mt-1">
               {gridData.total_conflicts > 0 ? 'Zero silent failures active' : 'All constraints fulfilled'}
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-            <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Workforce Scheduled</div>
-            <div className="text-2xl font-bold text-app-primaryText mt-1">{gridData.rows.length}</div>
-            <div className="text-[11px] text-slate-500 mt-0.5">Across {pods.length} operational pods</div>
+          <div className="kpi-card p-4">
+            <div className="text-xs font-bold uppercase tracking-wider text-[#CBD5E1]">Workforce Scheduled</div>
+            <div className="text-2xl font-black text-[#F8FAFC] mt-1">{gridData.rows.length}</div>
+            <div className="text-[11px] text-[#94A3B8] mt-0.5">Across {pods.length} operational pods</div>
           </div>
         </div>
       )}
 
       {/* Stakeholder View Selector (Company, Pod, Brand, Process, Employee) */}
-      <div className="bg-white p-3 rounded-enterprise border border-app-border shadow-subtle flex flex-wrap items-center justify-between gap-3">
+      <div className="glass-card p-3 rounded-enterprise border border-[rgba(148,163,184,0.16)] shadow-glass flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center space-x-1.5 overflow-x-auto py-0.5">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Roster Views:</span>
+          <span className="text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider mr-1">Roster Views:</span>
           {[
             { id: 'COMPANY', label: 'Company-Wide', desc: 'All 32 specialists' },
             { id: 'POD', label: 'Pod-Wise', desc: 'By operational pod' },
@@ -443,10 +443,10 @@ export const RosterPlannerPage: React.FC = () => {
                   setSearchQuery('');
                 }
               }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-[200ms] ${
                 activeViewMode === v.id
-                  ? 'bg-teal-600 text-white shadow-xs'
-                  : 'bg-slate-50 hover:bg-slate-100 text-slate-600'
+                  ? 'bg-[#14B8A6] text-white shadow-md shadow-teal-500/25'
+                  : 'bg-[#111820] hover:bg-[#151D25] text-[#94A3B8] hover:text-[#F8FAFC] border border-[rgba(148,163,184,0.12)]'
               }`}
             >
               {v.label}
@@ -454,15 +454,15 @@ export const RosterPlannerPage: React.FC = () => {
           ))}
         </div>
 
-        <div className="text-[11px] text-slate-500 font-medium">
+        <div className="text-[11px] text-[#94A3B8] font-medium">
           {gridData ? `Showing ${filteredRows.length} scheduled specialists` : 'No active roster loaded'}
         </div>
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 glass-card p-4 rounded-enterprise border border-[rgba(148,163,184,0.16)] shadow-glass">
         <div className="relative flex-1 max-w-sm">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-[#64748B] absolute left-3.5 top-3" />
           <input
             type="text"
             placeholder="Search employee name or code..."
@@ -471,7 +471,7 @@ export const RosterPlannerPage: React.FC = () => {
               setSearchQuery(e.target.value);
               if (e.target.value) setActiveViewMode('EMPLOYEE');
             }}
-            className="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-slate-50 border border-app-border focus:bg-white focus:ring-1 focus:ring-teal-500"
+            className="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-[#080D12] border border-[rgba(148,163,184,0.18)] text-[#F8FAFC] placeholder-[#64748B] focus:border-[#14B8A6] focus:ring-1 focus:ring-[#14B8A6] transition-all"
           />
         </div>
 
@@ -483,7 +483,7 @@ export const RosterPlannerPage: React.FC = () => {
               setSelectedPodId(e.target.value);
               if (e.target.value !== 'ALL') setActiveViewMode('POD');
             }}
-            className="px-3 py-2 rounded-xl text-xs bg-white border border-app-border text-slate-700 font-medium focus:ring-1 focus:ring-teal-500"
+            className="px-3 py-2 rounded-xl text-xs bg-[#080D12] border border-[rgba(148,163,184,0.18)] text-[#F8FAFC] font-medium focus:border-[#14B8A6]"
           >
             <option value="ALL">All Operational Pods</option>
             {pods.map((p) => (
@@ -500,7 +500,7 @@ export const RosterPlannerPage: React.FC = () => {
               setSelectedBrandId(e.target.value);
               if (e.target.value !== 'ALL') setActiveViewMode('BRAND');
             }}
-            className="px-3 py-2 rounded-xl text-xs bg-white border border-app-border text-slate-700 font-medium focus:ring-1 focus:ring-teal-500"
+            className="px-3 py-2 rounded-xl text-xs bg-[#080D12] border border-[rgba(148,163,184,0.18)] text-[#F8FAFC] font-medium focus:border-[#14B8A6]"
           >
             <option value="ALL">All D2C Brands</option>
             {brands.map((b) => (
@@ -517,7 +517,7 @@ export const RosterPlannerPage: React.FC = () => {
               setSelectedProcessId(e.target.value);
               if (e.target.value !== 'ALL') setActiveViewMode('PROCESS');
             }}
-            className="px-3 py-2 rounded-xl text-xs bg-white border border-app-border text-slate-700 font-medium focus:ring-1 focus:ring-teal-500"
+            className="px-3 py-2 rounded-xl text-xs bg-[#080D12] border border-[rgba(148,163,184,0.18)] text-[#F8FAFC] font-medium focus:border-[#14B8A6]"
           >
             <option value="ALL">All Core Processes</option>
             {processes.map((pr) => (
@@ -531,32 +531,32 @@ export const RosterPlannerPage: React.FC = () => {
 
       {/* Master Grid Table */}
       {!gridData && !isLoading ? (
-        <div className="bg-white p-16 text-center rounded-enterprise border border-app-border">
-          <CalendarIcon className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-slate-800">No Roster Generated for this Period</h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+        <div className="glass-card p-16 text-center rounded-2xl border border-[rgba(148,163,184,0.16)] shadow-card">
+          <CalendarIcon className="w-12 h-12 text-[#94A3B8]/40 mx-auto mb-3" />
+          <h3 className="text-base font-bold text-[#F8FAFC]">No Roster Generated for this Period</h3>
+          <p className="text-xs text-[#94A3B8] mt-1 max-w-md mx-auto">
             Click 'Generate Roster' above to execute the deterministic scheduling engine for {currentMonth}/{currentYear}.
           </p>
           <button
             onClick={handleGenerateRoster}
             disabled={isGenerating}
-            className="mt-4 px-5 py-2.5 rounded-xl bg-app-primaryAccent hover:bg-app-primaryAccentHover text-white font-semibold text-xs shadow-md shadow-teal-500/20"
+            className="btn-primary mt-4 px-5 py-2.5 rounded-xl text-xs font-semibold"
           >
             Execute Scheduling Engine
           </button>
         </div>
       ) : (
-        <div className="bg-white rounded-enterprise border border-app-border shadow-subtle overflow-hidden">
+        <div className="glass-card rounded-2xl border border-[rgba(148,163,184,0.16)] shadow-card overflow-hidden">
           <div className="overflow-x-auto max-h-[650px] relative">
             <table className="w-full text-left border-collapse text-xs">
-              <thead className="bg-slate-50 border-b border-app-border sticky top-0 z-20 shadow-xs">
+              <thead className="bg-[#0A0F16]/95 border-b border-[rgba(148,163,184,0.16)] sticky top-0 z-20 backdrop-blur-md">
                 <tr>
                   {/* Sticky Employee Column Header */}
-                  <th className="py-3 px-4 font-bold text-slate-700 uppercase tracking-wider sticky left-0 bg-slate-50 z-30 min-w-[200px] border-r border-app-border">
+                  <th className="py-3 px-4 font-bold text-[#CBD5E1] uppercase tracking-wider sticky left-0 bg-[#0A0F16] z-30 min-w-[200px] border-r border-[rgba(148,163,184,0.16)]">
                     Employee / Pod
                   </th>
 
-                  <th className="py-3 px-2 font-semibold text-slate-500 uppercase tracking-wider text-center min-w-[60px] border-r border-app-border">
+                  <th className="py-3 px-2 font-semibold text-[#94A3B8] uppercase tracking-wider text-center min-w-[60px] border-r border-[rgba(148,163,184,0.16)]">
                     Summary
                   </th>
 
@@ -564,68 +564,68 @@ export const RosterPlannerPage: React.FC = () => {
                   {gridData?.days.map((d) => (
                     <th
                       key={d.date}
-                      className={`py-2 px-1 text-center min-w-[44px] border-r border-app-border transition-colors ${
+                      className={`py-2 px-1 text-center min-w-[44px] border-r border-[rgba(148,163,184,0.16)] transition-colors ${
                         d.is_sunday
-                          ? 'bg-rose-50/70 text-rose-800'
+                          ? 'bg-rose-950/30 text-rose-300'
                           : d.is_holiday
-                          ? 'bg-purple-50/70 text-purple-800'
-                          : 'text-slate-700'
+                          ? 'bg-purple-950/30 text-purple-300'
+                          : 'text-[#CBD5E1]'
                       }`}
                       title={d.holiday_name || undefined}
                     >
-                      <div className="text-[10px] uppercase font-semibold text-slate-400">{d.day_name}</div>
-                      <div className="text-xs font-bold">{d.day_number}</div>
+                      <div className="text-[10px] uppercase font-semibold text-[#64748B]">{d.day_name}</div>
+                      <div className="text-xs font-bold text-[#F8FAFC]">{d.day_number}</div>
                     </th>
                   ))}
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-app-border">
+              <tbody className="divide-y divide-[rgba(148,163,184,0.10)]">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={(gridData?.days.length || 30) + 2} className="py-12 text-center text-slate-400">
+                    <td colSpan={(gridData?.days.length || 30) + 2} className="py-12 text-center text-[#94A3B8]">
                       Loading schedule matrix...
                     </td>
                   </tr>
                 ) : filteredRows.length === 0 ? (
                   <tr>
-                    <td colSpan={(gridData?.days.length || 30) + 2} className="py-12 text-center text-slate-400">
+                    <td colSpan={(gridData?.days.length || 30) + 2} className="py-12 text-center text-[#94A3B8]">
                       No employees match the selected filters.
                     </td>
                   </tr>
                 ) : (
                   filteredRows.map((row) => (
-                    <tr key={row.employee_id} className="hover:bg-slate-50/60 transition-colors">
+                    <tr key={row.employee_id} className="hover:bg-[rgba(20,184,166,0.06)] transition-colors duration-150">
                       {/* Sticky Employee Cell */}
-                      <td className="py-2.5 px-4 sticky left-0 bg-white z-10 border-r border-app-border group-hover:bg-slate-50/60">
-                        <div className="font-bold text-slate-900 truncate max-w-[180px]">{row.employee_name}</div>
-                        <div className="text-[10px] text-slate-400 font-mono flex items-center space-x-1.5 mt-0.5">
+                      <td className="py-2.5 px-4 sticky left-0 bg-[#0B1016] z-10 border-r border-[rgba(148,163,184,0.16)] group-hover:bg-[#111820]">
+                        <div className="font-bold text-[#F8FAFC] truncate max-w-[180px]">{row.employee_name}</div>
+                        <div className="text-[10px] text-[#94A3B8] font-mono flex items-center space-x-1.5 mt-0.5">
                           <span>{row.employee_code}</span>
                           <span>•</span>
-                          <span className="truncate max-w-[110px]">{row.pod_name}</span>
+                          <span className="truncate max-w-[110px] text-[#2DD4BF]">{row.pod_name}</span>
                         </div>
                       </td>
 
                       {/* Summary Cell */}
-                      <td className="py-2.5 px-2 text-center border-r border-app-border font-mono text-[10px]">
-                        <span className="font-bold text-teal-700" title="Working Shifts">{row.total_working_days}W</span>
-                        <span className="text-slate-300 mx-1">/</span>
-                        <span className="text-slate-500" title="Weekly Offs">{row.total_off_days}O</span>
+                      <td className="py-2.5 px-2 text-center border-r border-[rgba(148,163,184,0.16)] font-mono text-[10px] bg-[#0A0F16]/50">
+                        <span className="font-bold text-[#2DD4BF]" title="Working Shifts">{row.total_working_days}W</span>
+                        <span className="text-[#64748B] mx-1">/</span>
+                        <span className="text-[#94A3B8]" title="Weekly Offs">{row.total_off_days}O</span>
                       </td>
 
                       {/* Day Cells */}
                       {gridData?.days.map((d) => {
                         const cell = row.schedule[d.date];
                         if (!cell) {
-                          return <td key={d.date} className="border-r border-app-border bg-slate-50" />;
+                          return <td key={d.date} className="border-r border-[rgba(148,163,184,0.16)] bg-[#080D12]/40" />;
                         }
 
                         return (
                           <td
                             key={d.date}
                             onClick={() => setSelectedCell({ row, cell })}
-                            className={`p-1 text-center border-r border-app-border cursor-pointer transition-all hover:ring-2 hover:ring-teal-500 hover:z-10 relative ${
-                              d.is_sunday ? 'bg-rose-50/20' : d.is_holiday ? 'bg-purple-50/20' : ''
+                            className={`p-1 text-center border-r border-[rgba(148,163,184,0.16)] cursor-pointer transition-all hover:ring-2 hover:ring-[#14B8A6] hover:z-10 relative ${
+                              d.is_sunday ? 'bg-rose-950/15' : d.is_holiday ? 'bg-purple-950/15' : ''
                             }`}
                           >
                             <div
@@ -637,26 +637,26 @@ export const RosterPlannerPage: React.FC = () => {
                                 <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 animate-ping" />
                               )}
                               {cell.has_conflict && (
-                                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-600" />
+                                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500" />
                               )}
 
                               {cell.status === 'WORKING' ? (
                                 <>
-                                  <span className="font-bold truncate max-w-[38px] text-[8px]">
+                                  <span className="font-bold truncate max-w-[38px] text-[8px] text-[#F8FAFC]">
                                     {cell.brand_name ? cell.brand_name.slice(0, 5) : 'SHIFT'}
                                   </span>
-                                  <span className="text-[7px] text-slate-500 truncate max-w-[38px]">
+                                  <span className="text-[7px] text-[#2DD4BF] truncate max-w-[38px]">
                                     {cell.process_name ? cell.process_name.slice(0, 4) : 'CS'}
                                   </span>
                                 </>
                               ) : cell.status === 'WEEKLY_OFF' ? (
-                                <span className="text-slate-400 font-mono text-[8px]">OFF</span>
+                                <span className="text-[#64748B] font-mono text-[8px]">OFF</span>
                               ) : cell.status === 'LEAVE' ? (
-                                <span className="text-amber-800 font-bold text-[8px]">LEAVE</span>
+                                <span className="text-amber-300 font-bold text-[8px]">LEAVE</span>
                               ) : cell.status === 'COMP_OFF' ? (
-                                <span className="text-sky-800 font-bold text-[8px]">COMP</span>
+                                <span className="text-cyan-300 font-bold text-[8px]">COMP</span>
                               ) : (
-                                <span className="text-purple-800 font-bold text-[8px]">HOLIDAY</span>
+                                <span className="text-purple-300 font-bold text-[8px]">HOLIDAY</span>
                               )}
                             </div>
                           </td>
@@ -673,49 +673,49 @@ export const RosterPlannerPage: React.FC = () => {
 
       {/* Cell Detail / Quick Inspect Modal */}
       {selectedCell && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-app-border max-w-sm w-full p-5 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-app-border pb-3">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-card-deep rounded-2xl border border-[rgba(148,163,184,0.22)] max-w-sm w-full p-5 shadow-elevated animate-modal space-y-4">
+            <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.16)] pb-3">
               <div>
-                <h3 className="text-sm font-bold text-slate-800">{selectedCell.row.employee_name}</h3>
-                <p className="text-[11px] text-slate-400 font-mono">{selectedCell.row.employee_code} • {selectedCell.row.pod_name}</p>
+                <h3 className="text-sm font-bold text-[#F8FAFC]">{selectedCell.row.employee_name}</h3>
+                <p className="text-[11px] text-[#94A3B8] font-mono">{selectedCell.row.employee_code} • {selectedCell.row.pod_name}</p>
               </div>
-              <button onClick={() => setSelectedCell(null)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setSelectedCell(null)} className="text-[#94A3B8] hover:text-[#F8FAFC] transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-500">Date</span>
-                <span className="font-mono font-bold text-slate-800">{selectedCell.cell.date} ({selectedCell.cell.day_name})</span>
+              <div className="flex justify-between py-1 border-b border-[rgba(148,163,184,0.10)]">
+                <span className="text-[#94A3B8]">Date</span>
+                <span className="font-mono font-bold text-[#F8FAFC]">{selectedCell.cell.date} ({selectedCell.cell.day_name})</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-500">Shift Status</span>
+              <div className="flex justify-between py-1 border-b border-[rgba(148,163,184,0.10)]">
+                <span className="text-[#94A3B8]">Shift Status</span>
                 <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${getCellBadge(selectedCell.cell)}`}>
                   {selectedCell.cell.status}
                 </span>
               </div>
               {selectedCell.cell.status === 'WORKING' && (
                 <>
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Brand Assigned</span>
-                    <span className="font-semibold text-teal-800">{selectedCell.cell.brand_name || 'Operational Floater'}</span>
+                  <div className="flex justify-between py-1 border-b border-[rgba(148,163,184,0.10)]">
+                    <span className="text-[#94A3B8]">Brand Assigned</span>
+                    <span className="font-semibold text-[#2DD4BF]">{selectedCell.cell.brand_name || 'Operational Floater'}</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Operational Process</span>
-                    <span className="font-semibold text-slate-800">{selectedCell.cell.process_name || 'Customer Support'}</span>
+                  <div className="flex justify-between py-1 border-b border-[rgba(148,163,184,0.10)]">
+                    <span className="text-[#94A3B8]">Operational Process</span>
+                    <span className="font-semibold text-[#F8FAFC]">{selectedCell.cell.process_name || 'Customer Support'}</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-slate-100">
-                    <span className="text-slate-500">Shift Hours</span>
-                    <span className="font-mono text-slate-700">{selectedCell.cell.shift_start} - {selectedCell.cell.shift_end}</span>
+                  <div className="flex justify-between py-1 border-b border-[rgba(148,163,184,0.10)]">
+                    <span className="text-[#94A3B8]">Shift Hours</span>
+                    <span className="font-mono text-[#CBD5E1]">{selectedCell.cell.shift_start} - {selectedCell.cell.shift_end}</span>
                   </div>
                 </>
               )}
 
               {selectedCell.cell.has_conflict && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start space-x-2 mt-2">
-                  <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-xs flex items-start space-x-2 mt-2">
+                  <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
                   <div>
                     <div className="font-bold">Active Conflict Flagged</div>
                     <div>{selectedCell.cell.conflict_title || 'Coverage shortfall or labor policy violation detected on this date.'}</div>
@@ -738,15 +738,15 @@ export const RosterPlannerPage: React.FC = () => {
                   setSelectedCell(null);
                   setIsSimulatorOpen(true);
                 }}
-                className="w-full py-2.5 rounded-xl bg-teal-50 hover:bg-teal-100 border border-teal-200 text-teal-800 text-xs font-semibold flex items-center justify-center space-x-2 transition-all"
+                className="w-full py-2.5 rounded-xl bg-[rgba(20,184,166,0.12)] hover:bg-[rgba(20,184,166,0.22)] border border-[#14B8A6]/40 text-[#2DD4BF] text-xs font-semibold flex items-center justify-center space-x-2 transition-all"
               >
-                <FlaskConical className="w-4 h-4 text-teal-600" />
+                <FlaskConical className="w-4 h-4 text-[#2DD4BF]" />
                 <span>Simulate Operational Impact</span>
               </button>
 
               <button
                 onClick={() => handleOpenReassignModal(selectedCell.row, selectedCell.cell)}
-                className="w-full py-2.5 rounded-xl bg-app-primaryAccent hover:bg-app-primaryAccentHover text-white text-xs font-semibold shadow-md shadow-teal-500/20 flex items-center justify-center space-x-2 transition-all"
+                className="btn-primary w-full py-2.5 text-xs font-semibold flex items-center justify-center space-x-2"
               >
                 <Sparkles className="w-4 h-4" />
                 <span>Reassign Specialist / Find Backup</span>
@@ -754,7 +754,7 @@ export const RosterPlannerPage: React.FC = () => {
 
               <button
                 onClick={() => setSelectedCell(null)}
-                className="w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold"
+                className="btn-secondary w-full py-2 text-xs font-semibold"
               >
                 Close Details
               </button>
@@ -765,56 +765,56 @@ export const RosterPlannerPage: React.FC = () => {
 
       {/* Change Management / Intelligent Backup Recommendation Modal */}
       {isReassignModalOpen && reassignTarget && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-app-border max-w-xl w-full p-6 shadow-2xl space-y-5">
-            <div className="flex items-center justify-between border-b border-app-border pb-3">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-card-deep rounded-2xl border border-[rgba(148,163,184,0.22)] max-w-xl w-full p-6 shadow-elevated animate-modal space-y-5">
+            <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.16)] pb-3">
               <div>
-                <h3 className="text-base font-bold text-app-primaryText flex items-center space-x-2">
-                  <Sparkles className="w-5 h-5 text-teal-600" />
+                <h3 className="text-base font-bold text-[#F8FAFC] flex items-center space-x-2">
+                  <Sparkles className="w-5 h-5 text-[#2DD4BF]" />
                   <span>Intelligent Shift Reassignment & Backup</span>
                 </h3>
-                <p className="text-xs text-app-secondaryText mt-0.5">
+                <p className="text-xs text-[#94A3B8] mt-0.5">
                   Replace {reassignTarget.row.employee_name} on {reassignTarget.cell.date} without rebuilding the roster.
                 </p>
               </div>
-              <button onClick={() => setIsReassignModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setIsReassignModalOpen(false)} className="text-[#94A3B8] hover:text-[#F8FAFC] transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Shift Context Card */}
-            <div className="p-3.5 rounded-xl bg-teal-50/50 border border-teal-200 text-xs space-y-1">
+            <div className="p-3.5 rounded-xl bg-[rgba(20,184,166,0.08)] border border-[#14B8A6]/25 text-xs space-y-1">
               <div className="flex justify-between">
-                <span className="text-slate-600">Target Shift:</span>
-                <span className="font-bold text-teal-900">
+                <span className="text-[#94A3B8]">Target Shift:</span>
+                <span className="font-bold text-[#2DD4BF]">
                   {reassignTarget.cell.brand_name || 'Brand Shift'} ({reassignTarget.cell.process_name || 'Process'})
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600">Unavailable Specialist:</span>
-                <span className="font-semibold text-slate-800">
+                <span className="text-[#94A3B8]">Unavailable Specialist:</span>
+                <span className="font-semibold text-[#F8FAFC]">
                   {reassignTarget.row.employee_name} ({reassignTarget.row.pod_name})
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600">Shift Date:</span>
-                <span className="font-mono font-bold text-slate-800">{reassignTarget.cell.date}</span>
+                <span className="text-[#94A3B8]">Shift Date:</span>
+                <span className="font-mono font-bold text-[#F8FAFC]">{reassignTarget.cell.date}</span>
               </div>
             </div>
 
             {/* Scored Recommendations List */}
             <div className="space-y-2">
-              <div className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
+              <div className="text-xs font-bold text-[#CBD5E1] uppercase tracking-wider flex items-center justify-between">
                 <span>Ranked Backup Candidates</span>
-                <span className="text-[11px] font-normal text-slate-500">Sorted by multi-factor suitability</span>
+                <span className="text-[11px] font-normal text-[#94A3B8]">Sorted by multi-factor suitability</span>
               </div>
 
               {isLoadingRecs ? (
-                <div className="py-8 text-center text-xs text-slate-400">
+                <div className="py-8 text-center text-xs text-[#94A3B8]">
                   Evaluating pod floaters, skills & labor law compliance...
                 </div>
               ) : recommendations.length === 0 ? (
-                <div className="py-6 text-center text-xs text-slate-400 border border-dashed rounded-xl">
+                <div className="py-6 text-center text-xs text-[#94A3B8] border border-dashed border-[rgba(148,163,184,0.20)] rounded-xl">
                   No eligible candidates found.
                 </div>
               ) : (
@@ -827,8 +827,8 @@ export const RosterPlannerPage: React.FC = () => {
                         onClick={() => setSelectedBackupEmpId(rec.employee_id)}
                         className={`p-3 rounded-xl border cursor-pointer transition-all ${
                           isSelected
-                            ? 'border-teal-500 bg-teal-50/30 ring-1 ring-teal-500'
-                            : 'border-app-border hover:border-slate-300 bg-white'
+                            ? 'border-[#14B8A6] bg-[rgba(20,184,166,0.12)] ring-1 ring-[#14B8A6]'
+                            : 'border-[rgba(148,163,184,0.16)] hover:border-[#14B8A6]/40 bg-[#111820]'
                         }`}
                       >
                         <div className="flex items-center justify-between">
@@ -838,11 +838,11 @@ export const RosterPlannerPage: React.FC = () => {
                               name="backup_employee"
                               checked={isSelected}
                               onChange={() => setSelectedBackupEmpId(rec.employee_id)}
-                              className="text-teal-600 focus:ring-teal-500"
+                              className="text-[#14B8A6] focus:ring-[#14B8A6] bg-[#080D12] border-[rgba(148,163,184,0.3)]"
                             />
                             <div>
-                              <span className="font-bold text-slate-900 text-xs">{rec.full_name}</span>
-                              <span className="text-[10px] text-slate-400 font-mono ml-1.5">
+                              <span className="font-bold text-[#F8FAFC] text-xs">{rec.full_name}</span>
+                              <span className="text-[10px] text-[#94A3B8] font-mono ml-1.5">
                                 {rec.employee_code} • {rec.pod_name}
                               </span>
                             </div>
@@ -852,10 +852,10 @@ export const RosterPlannerPage: React.FC = () => {
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                                 rec.suitability_score >= 80
-                                  ? 'bg-emerald-100 text-emerald-800'
+                                  ? 'bg-emerald-950/80 border border-emerald-400/50 text-emerald-300'
                                   : rec.suitability_score >= 60
-                                  ? 'bg-teal-100 text-teal-800'
-                                  : 'bg-amber-100 text-amber-800'
+                                  ? 'bg-teal-950/80 border border-teal-400/50 text-[#2DD4BF]'
+                                  : 'bg-amber-950/80 border border-amber-400/50 text-amber-300'
                               }`}
                             >
                               {rec.suitability_score}% Match
@@ -870,15 +870,15 @@ export const RosterPlannerPage: React.FC = () => {
                               key={idx}
                               className={`px-2 py-0.5 rounded-md ${
                                 reason.includes('Alert')
-                                  ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                                  : 'bg-slate-100 text-slate-600'
+                                  ? 'bg-rose-950/60 text-rose-300 border border-rose-500/40'
+                                  : 'bg-[#151D25] text-[#CBD5E1] border border-[rgba(148,163,184,0.12)]'
                               }`}
                             >
                               {reason}
                             </span>
                           ))}
                           {rec.requires_comp_off && (
-                            <span className="px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 font-semibold border border-sky-200">
+                            <span className="px-2 py-0.5 rounded-md bg-cyan-950/60 text-cyan-300 font-semibold border border-cyan-400/40">
                               +1 Comp-Off Credit
                             </span>
                           )}
@@ -891,9 +891,9 @@ export const RosterPlannerPage: React.FC = () => {
             </div>
 
             {/* Override Form */}
-            <form onSubmit={handleSubmitOverride} className="space-y-3 pt-2 border-t border-app-border text-xs">
+            <form onSubmit={handleSubmitOverride} className="space-y-3 pt-2 border-t border-[rgba(148,163,184,0.16)] text-xs">
               <div>
-                <label className="block text-slate-700 font-semibold mb-1">
+                <label className="block text-[#CBD5E1] font-semibold mb-1">
                   Operational Justification *
                 </label>
                 <input
@@ -902,7 +902,7 @@ export const RosterPlannerPage: React.FC = () => {
                   onChange={(e) => setOverrideReason(e.target.value)}
                   placeholder="e.g., Medical leave emergency cover, swapped with pod lead approval..."
                   required
-                  className="w-full px-3 py-2 rounded-xl border border-app-border focus:ring-1 focus:ring-teal-500"
+                  className="w-full px-3 py-2 rounded-xl bg-[#080D12] border border-[rgba(148,163,184,0.22)] text-[#F8FAFC] placeholder-[#64748B] focus:border-[#14B8A6] focus:ring-1 focus:ring-[#14B8A6]"
                 />
               </div>
 
@@ -910,14 +910,14 @@ export const RosterPlannerPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsReassignModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium"
+                  className="btn-secondary px-4 py-2 text-xs font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingOverride || !selectedBackupEmpId}
-                  className="px-5 py-2 rounded-xl bg-app-primaryAccent hover:bg-app-primaryAccentHover text-white font-semibold flex items-center space-x-2 shadow-md shadow-teal-500/20 disabled:opacity-50"
+                  className="btn-primary px-5 py-2 text-xs font-semibold flex items-center space-x-2 disabled:opacity-50"
                 >
                   <UserCheck className="w-4 h-4" />
                   <span>{isSubmittingOverride ? 'Applying Override...' : 'Confirm In-Place Swap'}</span>
@@ -930,43 +930,43 @@ export const RosterPlannerPage: React.FC = () => {
 
       {/* Historical Audit Trail Modal */}
       {isAuditModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-app-border max-w-2xl w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-app-border pb-3">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-card-deep rounded-2xl border border-[rgba(148,163,184,0.22)] max-w-2xl w-full p-6 shadow-elevated animate-modal space-y-4">
+            <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.16)] pb-3">
               <div className="flex items-center space-x-2">
-                <History className="w-5 h-5 text-slate-600" />
-                <h3 className="text-base font-bold text-slate-800">Roster Change Audit Trail</h3>
+                <History className="w-5 h-5 text-[#2DD4BF]" />
+                <h3 className="text-base font-bold text-[#F8FAFC]">Roster Change Audit Trail</h3>
               </div>
-              <button onClick={() => setIsAuditModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setIsAuditModalOpen(false)} className="text-[#94A3B8] hover:text-[#F8FAFC] transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-[#94A3B8]">
               Immutable ledger of manual shift overrides, emergency reassignments, and roster versions.
             </p>
 
             <div className="max-h-80 overflow-y-auto space-y-2.5 pr-1">
               {isLoadingAudit ? (
-                <div className="py-8 text-center text-xs text-slate-400">Loading audit log records...</div>
+                <div className="py-8 text-center text-xs text-[#94A3B8]">Loading audit log records...</div>
               ) : auditLogs.length === 0 ? (
-                <div className="py-8 text-center text-xs text-slate-400 border border-dashed rounded-xl">
+                <div className="py-8 text-center text-xs text-[#94A3B8] border border-dashed border-[rgba(148,163,184,0.20)] rounded-xl">
                   No manual overrides recorded for this period.
                 </div>
               ) : (
                 auditLogs.map((log) => (
-                  <div key={log.id} className="p-3.5 rounded-xl border border-app-border bg-slate-50/50 text-xs space-y-1">
+                  <div key={log.id} className="p-3.5 rounded-xl border border-[rgba(148,163,184,0.16)] bg-[#111820] text-xs space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-900 font-mono">{log.action}</span>
-                      <span className="text-[11px] text-slate-400 font-mono">
+                      <span className="font-bold text-[#2DD4BF] font-mono">{log.action}</span>
+                      <span className="text-[11px] text-[#94A3B8] font-mono">
                         {new Date(log.timestamp).toLocaleString()}
                       </span>
                     </div>
-                    <div className="text-slate-600 text-[11px]">
-                      By: <span className="font-semibold text-slate-800">{log.user_name || 'Operations Lead'}</span>
+                    <div className="text-[#94A3B8] text-[11px]">
+                      By: <span className="font-semibold text-[#F8FAFC]">{log.user_name || 'Operations Lead'}</span>
                     </div>
                     {log.change_details && (
-                      <div className="mt-1 p-2 rounded-lg bg-white border border-slate-200 text-[11px] text-slate-700 font-mono break-all">
+                      <div className="mt-1 p-2 rounded-lg bg-[#080D12] border border-[rgba(148,163,184,0.16)] text-[11px] text-[#CBD5E1] font-mono break-all">
                         {log.change_details}
                       </div>
                     )}
@@ -975,10 +975,10 @@ export const RosterPlannerPage: React.FC = () => {
               )}
             </div>
 
-            <div className="pt-2 border-t border-app-border flex justify-end">
+            <div className="pt-2 border-t border-[rgba(148,163,184,0.16)] flex justify-end">
               <button
                 onClick={() => setIsAuditModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold"
+                className="btn-secondary px-4 py-2 text-xs font-semibold"
               >
                 Close Audit Trail
               </button>

@@ -160,78 +160,78 @@ export const ApprovalsPage: React.FC = () => {
   const selectedCount = Object.values(selectedIds).filter(Boolean).length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-fade">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-app-primaryText">Approvals Workflow & Governance</h1>
-          <p className="text-sm text-app-secondaryText mt-0.5">
+          <h1 className="text-2xl font-black text-[#F8FAFC] tracking-tight">Approvals Workflow & Governance</h1>
+          <p className="text-sm text-[#94A3B8] mt-0.5">
             Operational sign-off for planned time-off, emergency comp-offs, and roster change requests.
           </p>
         </div>
 
         <button
           onClick={activeTab === 'PENDING' ? fetchData : fetchHistory}
-          className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-white border border-app-border hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-subtle transition-all"
+          className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl btn-secondary text-xs font-semibold"
         >
-          <Clock className="w-4 h-4 text-slate-500" />
+          <Clock className="w-4 h-4 text-[#2DD4BF]" />
           <span>Refresh Queue</span>
         </button>
       </div>
 
       {notification && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center space-x-2.5 shadow-subtle">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+        <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-sm flex items-center space-x-2.5 shadow-subtle animate-toast">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
           <span>{notification}</span>
         </div>
       )}
 
       {/* KPI Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Total Pending</div>
-          <div className="text-2xl font-bold text-amber-600 mt-1">{stats?.total_pending ?? 0}</div>
-          <div className="text-[11px] text-amber-700 font-medium mt-0.5">Requires reviewer decision</div>
+        <div className="kpi-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Total Pending</div>
+          <div className="text-2xl font-black text-amber-400 mt-1">{stats?.total_pending ?? 0}</div>
+          <div className="text-[11px] text-amber-400 font-medium mt-0.5">Requires reviewer decision</div>
         </div>
 
-        <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Pending Leaves</div>
-          <div className="text-2xl font-bold text-teal-600 mt-1">{stats?.pending_leaves ?? 0}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5">Planned / Casual time-off</div>
+        <div className="kpi-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Pending Leaves</div>
+          <div className="text-2xl font-black text-[#2DD4BF] mt-1">{stats?.pending_leaves ?? 0}</div>
+          <div className="text-[11px] text-[#94A3B8] mt-0.5">Planned / Casual time-off</div>
         </div>
 
-        <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Pending Comp-Offs</div>
-          <div className="text-2xl font-bold text-blue-600 mt-1">{stats?.pending_compoffs ?? 0}</div>
-          <div className="text-[11px] text-slate-500 mt-0.5">Earned from overtime/Sunday</div>
+        <div className="kpi-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Pending Comp-Offs</div>
+          <div className="text-2xl font-black text-blue-400 mt-1">{stats?.pending_compoffs ?? 0}</div>
+          <div className="text-[11px] text-[#94A3B8] mt-0.5">Earned from overtime/Sunday</div>
         </div>
 
-        <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Approved Requests</div>
-          <div className="text-2xl font-bold text-emerald-600 mt-1">{stats?.approved_this_month ?? 0}</div>
-          <div className="text-[11px] text-emerald-700 font-medium mt-0.5">Reflected in active rosters</div>
+        <div className="kpi-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Approved Requests</div>
+          <div className="text-2xl font-black text-emerald-400 mt-1">{stats?.approved_this_month ?? 0}</div>
+          <div className="text-[11px] text-emerald-400 font-medium mt-0.5">Reflected in active rosters</div>
         </div>
       </div>
 
       {/* Tabs & Batch Actions Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-app-border pb-3">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-[rgba(148,163,184,0.16)] pb-3">
         <div className="flex space-x-2">
           <button
             onClick={() => setActiveTab('PENDING')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold tab-transition ${
               activeTab === 'PENDING'
-                ? 'bg-app-sidebar text-white shadow-sm'
-                : 'bg-white text-slate-600 border border-app-border hover:bg-slate-50'
+                ? 'bg-[#14B8A6] text-white shadow-md shadow-teal-500/20'
+                : 'bg-[#111820] text-[#94A3B8] border border-[rgba(148,163,184,0.16)] hover:text-[#F8FAFC]'
             }`}
           >
             Pending Queue ({pendingItems.length})
           </button>
           <button
             onClick={() => setActiveTab('HISTORY')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold tab-transition ${
               activeTab === 'HISTORY'
-                ? 'bg-app-sidebar text-white shadow-sm'
-                : 'bg-white text-slate-600 border border-app-border hover:bg-slate-50'
+                ? 'bg-[#14B8A6] text-white shadow-md shadow-teal-500/20'
+                : 'bg-[#111820] text-[#94A3B8] border border-[rgba(148,163,184,0.16)] hover:text-[#F8FAFC]'
             }`}
           >
             Review History
@@ -240,18 +240,18 @@ export const ApprovalsPage: React.FC = () => {
 
         {/* Batch Actions when items are selected in Pending tab */}
         {activeTab === 'PENDING' && selectedCount > 0 && (
-          <div className="flex items-center space-x-2 animate-fadeIn">
-            <span className="text-xs text-slate-600 font-semibold">{selectedCount} selected</span>
+          <div className="flex items-center space-x-2 animate-dropdown">
+            <span className="text-xs text-[#CBD5E1] font-semibold">{selectedCount} selected</span>
             <button
               onClick={() => handleBatchReview('APPROVED')}
-              className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-xs flex items-center space-x-1"
+              className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-xs flex items-center space-x-1 transition-all"
             >
               <Check className="w-3.5 h-3.5" />
               <span>Approve Selected</span>
             </button>
             <button
               onClick={() => handleBatchReview('REJECTED')}
-              className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs shadow-xs flex items-center space-x-1"
+              className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs shadow-xs flex items-center space-x-1 transition-all"
             >
               <X className="w-3.5 h-3.5" />
               <span>Reject Selected</span>
@@ -261,7 +261,7 @@ export const ApprovalsPage: React.FC = () => {
       </div>
 
       {/* Filter Controls */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 glass-card p-4 rounded-2xl border border-[rgba(148,163,184,0.16)]">
         <div className="relative flex-1 max-w-sm">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
           <input
@@ -437,30 +437,30 @@ export const ApprovalsPage: React.FC = () => {
 
       {/* Review Modal */}
       {reviewTarget && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-app-border max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-app-border pb-3">
-              <h3 className="text-base font-bold text-app-primaryText">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-card-deep rounded-2xl border border-[rgba(148,163,184,0.22)] max-w-md w-full p-6 shadow-elevated animate-modal space-y-4">
+            <div className="flex items-center justify-between border-b border-[rgba(148,163,184,0.16)] pb-3">
+              <h3 className="text-base font-bold text-[#F8FAFC]">
                 {reviewTarget.decision === 'APPROVED' ? 'Confirm Approval' : 'Confirm Rejection'}
               </h3>
-              <button onClick={() => setReviewTarget(null)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setReviewTarget(null)} className="text-[#94A3B8] hover:text-[#F8FAFC] transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
-              <div className="font-semibold text-slate-800">
+            <div className="p-3.5 rounded-xl bg-[#080D12] border border-[rgba(148,163,184,0.16)] text-xs space-y-1">
+              <div className="font-semibold text-[#F8FAFC]">
                 {reviewTarget.item.employee_name} ({reviewTarget.item.employee_code})
               </div>
-              <div className="text-slate-600">
+              <div className="text-[#CBD5E1]">
                 {reviewTarget.item.request_type} • {reviewTarget.item.date_range}
               </div>
-              <div className="text-slate-500 italic">"{reviewTarget.item.reason}"</div>
+              <div className="text-[#94A3B8] italic">"{reviewTarget.item.reason}"</div>
             </div>
 
             <form onSubmit={handleSingleReview} className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-700 font-semibold mb-1">
+                <label className="block text-[#CBD5E1] font-semibold mb-1">
                   Reviewer Justification / Feedback
                 </label>
                 <textarea
@@ -468,7 +468,7 @@ export const ApprovalsPage: React.FC = () => {
                   onChange={(e) => setReviewComments(e.target.value)}
                   placeholder="e.g., Authorized, pod coverage verified..."
                   rows={2}
-                  className="w-full px-3 py-2 rounded-xl border border-app-border focus:ring-1 focus:ring-teal-500"
+                  className="w-full px-3 py-2 rounded-xl bg-[#080D12] border border-[rgba(148,163,184,0.22)] text-[#F8FAFC] placeholder-[#64748B] focus:border-[#14B8A6]"
                 />
               </div>
 
@@ -476,17 +476,17 @@ export const ApprovalsPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setReviewTarget(null)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium"
+                  className="btn-secondary px-4 py-2 text-xs font-semibold rounded-xl"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`px-5 py-2 rounded-xl font-semibold text-white shadow-xs ${
+                  className={`px-5 py-2 rounded-xl font-semibold text-white shadow-xs transition-all ${
                     reviewTarget.decision === 'APPROVED'
-                      ? 'bg-emerald-600 hover:bg-emerald-700'
-                      : 'bg-rose-600 hover:bg-rose-700'
+                      ? 'bg-emerald-600 hover:bg-emerald-500'
+                      : 'bg-rose-600 hover:bg-rose-500'
                   }`}
                 >
                   {isSubmitting ? 'Submitting...' : `Confirm ${reviewTarget.decision}`}

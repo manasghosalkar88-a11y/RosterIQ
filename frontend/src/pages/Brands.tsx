@@ -95,19 +95,19 @@ export const BrandsPage: React.FC = () => {
   const multiResourceCount = brands.filter((b) => !b.is_single_resource).length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-fade">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-app-primaryText">D2C Brand Management</h1>
-          <p className="text-sm text-app-secondaryText mt-0.5">
+          <h1 className="text-2xl font-black text-[#F8FAFC] tracking-tight">D2C Brand Management</h1>
+          <p className="text-sm text-[#94A3B8] mt-0.5">
             Client accounts, operating calendars, process rules, and staffing patterns.
           </p>
         </div>
 
         <div className="inline-flex items-center space-x-2">
-          <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200 flex items-center space-x-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-teal-600" />
+          <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[rgba(20,184,166,0.12)] text-[#2DD4BF] border border-[#14B8A6]/30 flex items-center space-x-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-[#2DD4BF]" />
             <span>80% Single-Resource / 20% Multi-Resource Enforced</span>
           </span>
         </div>
@@ -115,39 +115,39 @@ export const BrandsPage: React.FC = () => {
 
       {/* KPI Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Total D2C Brands</div>
-          <div className="text-2xl font-bold text-app-primaryText mt-1">{brands.length}</div>
-          <div className="text-[11px] text-app-secondaryText mt-0.5">Active client engagements</div>
+        <div className="kpi-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Total D2C Brands</div>
+          <div className="text-2xl font-black text-[#F8FAFC] mt-1">{brands.length}</div>
+          <div className="text-[11px] text-[#94A3B8] mt-0.5">Active client engagements</div>
         </div>
 
-        <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Single-Resource Brands</div>
-          <div className="text-2xl font-bold text-teal-600 mt-1">{singleResourceCount}</div>
-          <div className="text-[11px] text-teal-700 font-medium mt-0.5">
+        <div className="kpi-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Single-Resource Brands</div>
+          <div className="text-2xl font-black text-[#2DD4BF] mt-1">{singleResourceCount}</div>
+          <div className="text-[11px] text-[#2DD4BF] font-medium mt-0.5">
             {brands.length > 0 ? `${Math.round((singleResourceCount / brands.length) * 100)}% of client portfolio` : '0%'}
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Multi-Resource Brands</div>
-          <div className="text-2xl font-bold text-blue-600 mt-1">{multiResourceCount}</div>
-          <div className="text-[11px] text-blue-700 font-medium mt-0.5">
+        <div className="kpi-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Multi-Resource Brands</div>
+          <div className="text-2xl font-black text-blue-400 mt-1">{multiResourceCount}</div>
+          <div className="text-[11px] text-blue-400 font-medium mt-0.5">
             {brands.length > 0 ? `${Math.round((multiResourceCount / brands.length) * 100)}% high volume` : '0%'}
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">365-Day Operations</div>
-          <div className="text-2xl font-bold text-amber-600 mt-1">
+        <div className="kpi-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">365-Day Operations</div>
+          <div className="text-2xl font-black text-amber-400 mt-1">
             {brands.filter((b) => b.process_rules.some((r) => r.rule_type === 'EVERY_DAY_365')).length}
           </div>
-          <div className="text-[11px] text-amber-700 font-medium mt-0.5">Includes Sundays & Holidays</div>
+          <div className="text-[11px] text-amber-400 font-medium mt-0.5">Includes Sundays & Holidays</div>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="glass-card p-4 rounded-2xl border border-[rgba(148,163,184,0.16)] flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-app-secondaryText absolute left-3 top-3" />
           <input
@@ -331,27 +331,27 @@ export const BrandsPage: React.FC = () => {
 
       {/* Brand Detail Modal */}
       {viewingBrand && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-app-border max-w-2xl w-full p-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-card-deep rounded-2xl border border-[rgba(148,163,184,0.22)] max-w-2xl w-full p-6 shadow-elevated animate-modal relative">
             <button
               onClick={() => setViewingBrand(null)}
-              className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-start space-x-4 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 font-bold text-xl flex items-center justify-center flex-shrink-0 border border-teal-100">
+              <div className="w-12 h-12 rounded-2xl bg-[rgba(20,184,166,0.12)] text-[#2DD4BF] font-bold text-xl flex items-center justify-center flex-shrink-0 border border-[#14B8A6]/30">
                 {viewingBrand.name.charAt(0)}
               </div>
               <div>
-                <h3 className="text-xl font-bold text-app-primaryText">{viewingBrand.name}</h3>
-                <p className="text-xs text-app-secondaryText">{viewingBrand.client_name}</p>
+                <h3 className="text-xl font-bold text-[#F8FAFC]">{viewingBrand.name}</h3>
+                <p className="text-xs text-[#94A3B8]">{viewingBrand.client_name}</p>
                 <div className="flex items-center space-x-2 mt-1">
-                  <span className="text-[11px] font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded border">
+                  <span className="text-[11px] font-mono bg-[#080D12] text-[#2DD4BF] px-2 py-0.5 rounded border border-[rgba(148,163,184,0.16)]">
                     {viewingBrand.code}
                   </span>
-                  <span className="text-[11px] text-teal-700 font-medium">
+                  <span className="text-[11px] text-[#2DD4BF] font-medium">
                     {viewingBrand.pod_name}
                   </span>
                 </div>
@@ -360,12 +360,12 @@ export const BrandsPage: React.FC = () => {
 
             {/* Operating Rules Table */}
             <div className="mb-6">
-              <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+              <h4 className="text-xs font-bold text-[#CBD5E1] uppercase tracking-wider mb-2">
                 Process Operating Schedules & Headcount Requirements
               </h4>
-              <div className="border border-app-border rounded-xl overflow-hidden text-xs">
+              <div className="border border-[rgba(148,163,184,0.16)] rounded-xl overflow-hidden text-xs bg-[#111820]">
                 <table className="w-full text-left">
-                  <thead className="bg-slate-50 border-b border-app-border text-slate-500 font-semibold">
+                  <thead className="bg-[#0A0F16]/95 border-b border-[rgba(148,163,184,0.16)] text-[#CBD5E1] font-semibold">
                     <tr>
                       <th className="py-2.5 px-3">Process</th>
                       <th className="py-2.5 px-3">Operating Rule</th>
@@ -374,31 +374,31 @@ export const BrandsPage: React.FC = () => {
                       <th className="py-2.5 px-3 text-right">Configure</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-app-border">
+                  <tbody className="divide-y divide-[rgba(148,163,184,0.10)]">
                     {viewingBrand.process_rules.map((r) => (
-                      <tr key={r.id}>
-                        <td className="py-2 px-3 font-semibold text-slate-800">
+                      <tr key={r.id} className="hover:bg-[rgba(20,184,166,0.06)] transition-colors">
+                        <td className="py-2 px-3 font-semibold text-[#F8FAFC]">
                           {r.process_name} ({r.process_code})
                         </td>
                         <td className="py-2 px-3">
                           <span
                             className={`px-2 py-0.5 rounded font-medium text-[10px] ${
                               r.rule_type === 'EVERY_DAY_365'
-                                ? 'bg-amber-100 text-amber-800 font-bold'
-                                : 'bg-slate-100 text-slate-700'
+                                ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40 font-bold'
+                                : 'bg-[#151D25] text-[#CBD5E1] border border-[rgba(148,163,184,0.14)]'
                             }`}
                           >
                             {r.rule_type}
                           </span>
                         </td>
-                        <td className="py-2 px-3 font-bold text-teal-600">{r.min_headcount} agent(s)</td>
-                        <td className="py-2 px-3 text-slate-600">
+                        <td className="py-2 px-3 font-bold text-[#2DD4BF]">{r.min_headcount} agent(s)</td>
+                        <td className="py-2 px-3 text-[#94A3B8]">
                           {r.shift_start_time} - {r.shift_end_time}
                         </td>
                         <td className="py-2 px-3 text-right">
                           <button
                             onClick={() => startEditRule(r)}
-                            className="inline-flex items-center space-x-1 px-2 py-1 rounded-lg bg-slate-100 hover:bg-teal-50 hover:text-teal-700 text-slate-600 transition-colors"
+                            className="inline-flex items-center space-x-1 px-2 py-1 rounded-lg bg-[#151D25] hover:bg-[rgba(20,184,166,0.15)] hover:text-[#2DD4BF] text-[#CBD5E1] transition-colors border border-[rgba(148,163,184,0.16)]"
                             title="Edit operating calendar & headcount"
                           >
                             <Edit2 className="w-3 h-3" />
@@ -412,30 +412,30 @@ export const BrandsPage: React.FC = () => {
               </div>
 
               {ruleUpdateSuccess && (
-                <div className="mt-2 text-xs font-semibold text-emerald-600">
+                <div className="mt-2 text-xs font-semibold text-[#2DD4BF]">
                   ✓ {ruleUpdateSuccess}
                 </div>
               )}
 
               {/* Inline Rule Editor Form */}
               {editingRule && (
-                <form onSubmit={handleSaveRule} className="mt-3 p-3.5 rounded-xl bg-teal-50/50 border border-teal-200 space-y-3">
+                <form onSubmit={handleSaveRule} className="mt-3 p-3.5 rounded-xl bg-[rgba(20,184,166,0.08)] border border-[#14B8A6]/30 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-teal-900 text-xs">
+                    <span className="font-bold text-[#2DD4BF] text-xs">
                       Configuring Rule: {editingRule.process_name}
                     </span>
-                    <button type="button" onClick={() => setEditingRule(null)} className="text-slate-400 hover:text-slate-600">
+                    <button type="button" onClick={() => setEditingRule(null)} className="text-[#94A3B8] hover:text-[#F8FAFC]">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <label className="block text-slate-600 font-semibold mb-1">Operating Calendar Rule</label>
+                      <label className="block text-[#CBD5E1] font-semibold mb-1">Operating Calendar Rule</label>
                       <select
                         value={editRuleType}
                         onChange={(e) => setEditRuleType(e.target.value as any)}
-                        className="w-full px-2.5 py-1.5 rounded-lg border border-app-border bg-white text-xs"
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-[rgba(148,163,184,0.22)] bg-[#080D12] text-[#F8FAFC] text-xs focus:border-[#14B8A6]"
                       >
                         <option value="EVERY_DAY_365">365-Day Operations (Sundays & Holidays ON)</option>
                         <option value="EXCEPT_PUBLIC_HOLIDAYS">Daily Operations (Public Holidays OFF)</option>
@@ -444,14 +444,14 @@ export const BrandsPage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-slate-600 font-semibold mb-1">Required Daily Min Headcount</label>
+                      <label className="block text-[#CBD5E1] font-semibold mb-1">Required Daily Min Headcount</label>
                       <input
                         type="number"
                         min={1}
                         max={10}
                         value={editHeadcount}
                         onChange={(e) => setEditHeadcount(Number(e.target.value))}
-                        className="w-full px-2.5 py-1.5 rounded-lg border border-app-border bg-white text-xs"
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-[rgba(148,163,184,0.22)] bg-[#080D12] text-[#F8FAFC] text-xs focus:border-[#14B8A6]"
                       />
                     </div>
                   </div>
@@ -460,13 +460,13 @@ export const BrandsPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setEditingRule(null)}
-                      className="px-3 py-1 rounded-lg bg-slate-200 text-slate-700 text-xs"
+                      className="btn-secondary px-3 py-1 rounded-lg text-xs font-semibold"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="px-3 py-1 rounded-lg bg-teal-600 text-white font-semibold text-xs shadow-sm hover:bg-teal-700"
+                      className="btn-primary px-3 py-1 rounded-lg text-xs font-semibold"
                     >
                       Save Operating Rule
                     </button>
@@ -477,26 +477,26 @@ export const BrandsPage: React.FC = () => {
 
             {/* Assigned Staff */}
             <div>
-              <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+              <h4 className="text-xs font-bold text-[#CBD5E1] uppercase tracking-wider mb-2">
                 Assigned Team Members ({viewingBrand.assigned_employees.length})
               </h4>
               <div className="grid grid-cols-2 gap-2">
                 {viewingBrand.assigned_employees.map((emp, i) => (
                   <div
                     key={i}
-                    className="p-2.5 rounded-xl border border-app-border bg-slate-50/50 flex items-center justify-between text-xs"
+                    className="p-2.5 rounded-xl border border-[rgba(148,163,184,0.16)] bg-[#111820] flex items-center justify-between text-xs"
                   >
                     <div>
-                      <div className="font-semibold text-slate-800">{emp.full_name}</div>
-                      <div className="text-[10px] text-slate-500">
+                      <div className="font-semibold text-[#F8FAFC]">{emp.full_name}</div>
+                      <div className="text-[10px] text-[#94A3B8]">
                         {emp.designation} · {emp.process_name}
                       </div>
                     </div>
                     <span
                       className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${
                         emp.assignment_type === 'PRIMARY'
-                          ? 'bg-teal-100 text-teal-800'
-                          : 'bg-amber-100 text-amber-800'
+                          ? 'bg-teal-950/80 text-[#2DD4BF] border border-teal-500/40'
+                          : 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
                       }`}
                     >
                       {emp.assignment_type}
@@ -506,10 +506,10 @@ export const BrandsPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-app-border flex justify-end">
+            <div className="mt-6 pt-4 border-t border-[rgba(148,163,184,0.16)] flex justify-end">
               <button
                 onClick={() => setViewingBrand(null)}
-                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs transition-colors"
+                className="btn-secondary px-4 py-2 rounded-xl text-xs font-semibold"
               >
                 Close
               </button>

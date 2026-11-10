@@ -94,106 +94,106 @@ export const ConflictsAlertsPage: React.FC = () => {
   const getSeverityBadge = (sev: ConflictSeverity) => {
     switch (sev) {
       case 'CRITICAL':
-        return 'bg-rose-100 text-rose-800 border-rose-300';
+        return 'bg-rose-950/80 text-rose-300 border-rose-500/50';
       case 'HIGH':
-        return 'bg-amber-100 text-amber-800 border-amber-300';
+        return 'bg-amber-950/80 text-amber-300 border-amber-500/50';
       case 'MEDIUM':
-        return 'bg-blue-100 text-blue-800 border-blue-300';
+        return 'bg-blue-950/80 text-blue-300 border-blue-500/50';
       case 'LOW':
-        return 'bg-slate-100 text-slate-700 border-slate-300';
+        return 'bg-[#151D25] text-[#94A3B8] border-[rgba(148,163,184,0.2)]';
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-page-fade">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-app-primaryText">Scheduling Conflicts & Coverage Alerts</h1>
-          <p className="text-sm text-app-secondaryText mt-0.5">
+          <h1 className="text-2xl font-black text-[#F8FAFC] tracking-tight">Scheduling Conflicts & Coverage Alerts</h1>
+          <p className="text-sm text-[#94A3B8] mt-0.5">
             Real-time constraint auditor. Zero silent failures: all unstaffed slots and policy breaches are flagged here.
           </p>
         </div>
 
         <button
           onClick={fetchData}
-          className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-white border border-app-border hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-subtle transition-all"
+          className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl btn-secondary text-xs font-semibold"
         >
-          <Clock className="w-4 h-4 text-slate-500" />
+          <Clock className="w-4 h-4 text-[#2DD4BF]" />
           <span>Refresh Conflict Audit</span>
         </button>
       </div>
 
       {notification && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center space-x-2.5 shadow-subtle">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+        <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-sm flex items-center space-x-2.5 shadow-subtle animate-toast">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
           <span>{notification}</span>
         </div>
       )}
 
       {/* KPI Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-app-secondaryText">Total Conflicts</div>
-          <div className="text-2xl font-bold text-app-primaryText mt-1">{stats?.total_conflicts ?? 0}</div>
-          <div className="text-[11px] text-app-secondaryText mt-0.5">Identified by engine</div>
+        <div className="kpi-card p-4">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Total Conflicts</div>
+          <div className="text-2xl font-black text-[#F8FAFC] mt-1">{stats?.total_conflicts ?? 0}</div>
+          <div className="text-[11px] text-[#94A3B8] mt-0.5">Identified by engine</div>
         </div>
 
-        <div className="bg-white p-4 rounded-enterprise border border-rose-200 bg-rose-50/20 shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-rose-700">Critical Unstaffed</div>
-          <div className="text-2xl font-bold text-rose-600 mt-1">{stats?.critical_count ?? 0}</div>
-          <div className="text-[11px] text-rose-600 font-medium mt-0.5">Requires immediate backup</div>
+        <div className="kpi-card p-4 border-rose-500/30">
+          <div className="text-xs font-semibold uppercase tracking-wider text-rose-400">Critical Unstaffed</div>
+          <div className="text-2xl font-black text-rose-400 mt-1">{stats?.critical_count ?? 0}</div>
+          <div className="text-[11px] text-rose-400 font-medium mt-0.5">Requires immediate backup</div>
         </div>
 
-        <div className="bg-white p-4 rounded-enterprise border border-amber-200 bg-amber-50/20 shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-amber-700">High / Medium Severity</div>
-          <div className="text-2xl font-bold text-amber-600 mt-1">{(stats?.high_count ?? 0) + (stats?.medium_count ?? 0)}</div>
-          <div className="text-[11px] text-amber-700 font-medium mt-0.5">Labor rule or staffing shortfall</div>
+        <div className="kpi-card p-4 border-amber-500/30">
+          <div className="text-xs font-semibold uppercase tracking-wider text-amber-400">High / Medium Severity</div>
+          <div className="text-2xl font-black text-amber-400 mt-1">{(stats?.high_count ?? 0) + (stats?.medium_count ?? 0)}</div>
+          <div className="text-[11px] text-amber-400 font-medium mt-0.5">Labor rule or staffing shortfall</div>
         </div>
 
-        <div className="bg-white p-4 rounded-enterprise border border-emerald-200 bg-emerald-50/20 shadow-subtle">
-          <div className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Resolved Rate</div>
-          <div className="text-2xl font-bold text-emerald-600 mt-1">{stats?.resolution_rate ?? 100}%</div>
-          <div className="text-[11px] text-emerald-700 font-medium mt-0.5">{stats?.resolved_count ?? 0} conflicts addressed</div>
+        <div className="kpi-card p-4 border-emerald-500/30">
+          <div className="text-xs font-semibold uppercase tracking-wider text-emerald-400">Resolved Rate</div>
+          <div className="text-2xl font-black text-emerald-400 mt-1">{stats?.resolution_rate ?? 100}%</div>
+          <div className="text-[11px] text-emerald-400 font-medium mt-0.5">{stats?.resolved_count ?? 0} conflicts addressed</div>
         </div>
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-white p-4 rounded-enterprise border border-app-border shadow-subtle">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 glass-card p-4 rounded-2xl border border-[rgba(148,163,184,0.16)]">
         <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-[#94A3B8] absolute left-3.5 top-3" />
           <input
             type="text"
             placeholder="Search by brand, process, employee or issue..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-slate-50 border border-app-border focus:bg-white focus:ring-1 focus:ring-teal-500 transition-all"
+            className="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-[#080D12] border border-[rgba(148,163,184,0.18)] text-[#F8FAFC] placeholder-[#64748B] focus:border-[#14B8A6] transition-all"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {/* Status Tabs */}
-          <div className="inline-flex rounded-xl bg-slate-100 p-1 text-xs font-medium">
+          <div className="inline-flex rounded-xl bg-[#080D12] p-1 text-xs font-medium border border-[rgba(148,163,184,0.14)]">
             <button
               onClick={() => setStatusFilter('ALL')}
-              className={`px-3 py-1 rounded-lg ${
-                statusFilter === 'ALL' ? 'bg-white text-slate-800 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-800'
+              className={`px-3 py-1 rounded-lg transition-all ${
+                statusFilter === 'ALL' ? 'bg-[#151D25] text-[#F8FAFC] shadow-xs font-semibold' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
               }`}
             >
               All
             </button>
             <button
               onClick={() => setStatusFilter('UNRESOLVED')}
-              className={`px-3 py-1 rounded-lg ${
-                statusFilter === 'UNRESOLVED' ? 'bg-white text-rose-700 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-800'
+              className={`px-3 py-1 rounded-lg transition-all ${
+                statusFilter === 'UNRESOLVED' ? 'bg-rose-950/60 text-rose-300 shadow-xs font-semibold' : 'text-[#94A3B8] hover:text-rose-300'
               }`}
             >
               Unresolved
             </button>
             <button
               onClick={() => setStatusFilter('RESOLVED')}
-              className={`px-3 py-1 rounded-lg ${
-                statusFilter === 'RESOLVED' ? 'bg-white text-emerald-700 shadow-xs font-semibold' : 'text-slate-600 hover:text-slate-800'
+              className={`px-3 py-1 rounded-lg transition-all ${
+                statusFilter === 'RESOLVED' ? 'bg-emerald-950/60 text-emerald-300 shadow-xs font-semibold' : 'text-[#94A3B8] hover:text-emerald-300'
               }`}
             >
               Resolved
@@ -204,7 +204,7 @@ export const ConflictsAlertsPage: React.FC = () => {
           <select
             value={severityFilter}
             onChange={(e) => setSeverityFilter(e.target.value)}
-            className="px-3 py-2 rounded-xl text-xs bg-white border border-app-border text-slate-700 font-medium focus:ring-1 focus:ring-teal-500"
+            className="px-3 py-2 rounded-xl text-xs bg-[#080D12] border border-[rgba(148,163,184,0.18)] text-[#F8FAFC] font-medium focus:border-[#14B8A6]"
           >
             <option value="ALL">All Severities</option>
             <option value="CRITICAL">Critical</option>
@@ -218,16 +218,16 @@ export const ConflictsAlertsPage: React.FC = () => {
       {/* Conflict Cards List */}
       <div className="space-y-3">
         {isLoading ? (
-          <div className="bg-white p-12 text-center rounded-enterprise border border-app-border text-slate-400">
+          <div className="glass-card p-12 text-center rounded-2xl border border-[rgba(148,163,184,0.16)] text-[#94A3B8]">
             Auditing roster constraints...
           </div>
         ) : filteredConflicts.length === 0 ? (
-          <div className="bg-white p-12 text-center rounded-enterprise border border-app-border">
-            <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3">
+          <div className="glass-card p-12 text-center rounded-2xl border border-[rgba(148,163,184,0.16)]">
+            <div className="w-12 h-12 rounded-full bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto mb-3">
               <Check className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-slate-800">Zero Active Conflicts Found</h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+            <h3 className="text-base font-bold text-[#F8FAFC]">Zero Active Conflicts Found</h3>
+            <p className="text-xs text-[#94A3B8] mt-1 max-w-sm mx-auto">
               All shifts meet operational demand headcount and satisfy statutory labor compliance policies.
             </p>
           </div>
@@ -235,12 +235,12 @@ export const ConflictsAlertsPage: React.FC = () => {
           filteredConflicts.map((c) => (
             <div
               key={c.id}
-              className={`bg-white rounded-enterprise border p-5 transition-all shadow-subtle ${
+              className={`glass-card rounded-2xl border p-5 transition-all shadow-card ${
                 c.is_resolved
-                  ? 'border-emerald-200 bg-emerald-50/10 opacity-75'
+                  ? 'border-emerald-500/30 bg-emerald-950/15 opacity-80'
                   : c.severity === 'CRITICAL'
-                  ? 'border-rose-300 hover:border-rose-400'
-                  : 'border-app-border hover:border-slate-300'
+                  ? 'border-rose-500/40 hover:border-rose-500/60'
+                  : 'border-[rgba(148,163,184,0.16)] hover:border-[#14B8A6]/40'
               }`}
             >
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
@@ -333,23 +333,23 @@ export const ConflictsAlertsPage: React.FC = () => {
 
       {/* Resolution Modal */}
       {selectedConflict && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-app-border max-w-lg w-full p-6 shadow-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-app-primaryText flex items-center space-x-2">
-                <AlertTriangle className="w-5 h-5 text-amber-500" />
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-card-deep rounded-2xl border border-[rgba(148,163,184,0.22)] max-w-lg w-full p-6 shadow-elevated animate-modal">
+            <div className="flex items-center justify-between mb-4 border-b border-[rgba(148,163,184,0.16)] pb-3">
+              <h3 className="text-base font-bold text-[#F8FAFC] flex items-center space-x-2">
+                <AlertTriangle className="w-5 h-5 text-amber-400" />
                 <span>Resolve Scheduling Conflict</span>
               </h3>
-              <button onClick={() => setSelectedConflict(null)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setSelectedConflict(null)} className="text-[#94A3B8] hover:text-[#F8FAFC] transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="mb-4 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
-              <div className="font-semibold text-slate-800">{selectedConflict.title}</div>
-              <div className="text-slate-600">{selectedConflict.description}</div>
+            <div className="mb-4 p-3.5 rounded-xl bg-[#080D12] border border-[rgba(148,163,184,0.16)] text-xs space-y-1">
+              <div className="font-semibold text-[#F8FAFC]">{selectedConflict.title}</div>
+              <div className="text-[#94A3B8]">{selectedConflict.description}</div>
               {selectedConflict.recommended_action && (
-                <div className="text-teal-700 font-medium pt-1">
+                <div className="text-[#2DD4BF] font-medium pt-1">
                   Tip: {selectedConflict.recommended_action}
                 </div>
               )}
@@ -357,7 +357,7 @@ export const ConflictsAlertsPage: React.FC = () => {
 
             <form onSubmit={handleResolve} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-700 font-semibold mb-1">
+                <label className="block text-[#CBD5E1] font-semibold mb-1">
                   Resolution Decision & Notes *
                 </label>
                 <textarea
@@ -366,11 +366,11 @@ export const ConflictsAlertsPage: React.FC = () => {
                   placeholder="e.g., Assigned secondary backup from Pod Beta, or approved single-day variance..."
                   rows={3}
                   required
-                  className="w-full px-3 py-2 rounded-xl border border-app-border focus:ring-1 focus:ring-teal-500"
+                  className="w-full px-3 py-2 rounded-xl bg-[#080D12] border border-[rgba(148,163,184,0.22)] text-[#F8FAFC] placeholder-[#64748B] focus:border-[#14B8A6]"
                 />
               </div>
 
-              <div className="pt-3 border-t border-app-border flex items-center justify-between">
+              <div className="pt-3 border-t border-[rgba(148,163,184,0.16)] flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => {
@@ -388,9 +388,9 @@ export const ConflictsAlertsPage: React.FC = () => {
                     setSelectedConflict(null);
                     setIsSimulatorOpen(true);
                   }}
-                  className="px-3 py-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-xs font-bold flex items-center space-x-1.5"
+                  className="px-3.5 py-2 rounded-xl bg-[rgba(20,184,166,0.12)] hover:bg-[rgba(20,184,166,0.22)] text-[#2DD4BF] border border-[#14B8A6]/40 text-xs font-bold flex items-center space-x-1.5 transition-all"
                 >
-                  <FlaskConical className="w-3.5 h-3.5 text-teal-600" />
+                  <FlaskConical className="w-3.5 h-3.5 text-[#2DD4BF]" />
                   <span>Simulate in Engine</span>
                 </button>
 
@@ -398,13 +398,13 @@ export const ConflictsAlertsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setSelectedConflict(null)}
-                    className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium"
+                    className="btn-secondary px-4 py-2 text-xs font-semibold rounded-xl"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold flex items-center space-x-1.5"
+                    className="btn-primary px-4 py-2 text-xs font-semibold rounded-xl flex items-center space-x-1.5"
                   >
                     <Check className="w-4 h-4" />
                     <span>Confirm Resolution</span>

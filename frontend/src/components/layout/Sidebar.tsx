@@ -60,21 +60,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`bg-[#0B0E12] text-[#A0AAB5] flex flex-col transition-all duration-300 relative border-r border-white/10 h-screen z-20 select-none ${
+      className={`bg-[#080D12] text-[#94A3B8] flex flex-col transition-all duration-300 relative border-r border-[rgba(148,163,184,0.16)] h-screen z-20 select-none ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}
     >
       {/* Brand Header */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-white/10">
+      <div className="h-16 flex items-center justify-between px-4 border-b border-[rgba(148,163,184,0.16)] bg-[#080D12]">
         {!isCollapsed && (
           <div className="flex items-center space-x-3 overflow-hidden">
-            <div className="w-9 h-9 rounded-xl bg-[#397C70] flex items-center justify-center text-white font-bold text-lg shadow-md shadow-teal-500/20 border border-white/10 flex-shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#14B8A6] to-[#0D9488] flex items-center justify-center text-white font-extrabold text-lg shadow-md shadow-teal-500/25 border border-white/10 flex-shrink-0">
               R
             </div>
             <div className="leading-tight">
-              <span className="font-bold text-white text-base tracking-tight block">ROSTERIQ</span>
-              <span className="text-[10px] text-teal-400 font-semibold block tracking-wider uppercase font-mono">
-                Dark Glass Enterprise
+              <span className="font-bold text-[#F8FAFC] text-base tracking-tight block">ROSTERIQ</span>
+              <span className="text-[10px] text-[#2DD4BF] font-semibold block tracking-wider uppercase font-mono">
+                Dark Enterprise Glass
               </span>
             </div>
           </div>
@@ -82,7 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {isCollapsed && (
           <div className="w-full flex justify-center">
-            <div className="w-9 h-9 rounded-xl bg-[#397C70] flex items-center justify-center text-white font-bold text-lg shadow-md border border-white/10">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#14B8A6] to-[#0D9488] flex items-center justify-center text-white font-extrabold text-lg shadow-md border border-white/10">
               R
             </div>
           </div>
@@ -90,7 +90,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <button
           onClick={onToggleCollapse}
-          className="text-[#727E89] hover:text-white p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+          className="text-[#94A3B8] hover:text-[#F8FAFC] p-1.5 rounded-lg hover:bg-white/5 transition-colors"
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -107,17 +107,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.name}
               onClick={() => onSelectModule(item.name)}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all group ${
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-[180ms] ease-out group ${
                 isActive
-                  ? 'bg-[rgba(30,36,43,0.92)] text-white border-l-2 border-[#397C70] shadow-neumorph-raised'
-                  : 'text-[#A0AAB5] hover:text-white hover:bg-white/5'
+                  ? 'bg-[#151D25] text-[#F8FAFC] border-l-2 border-[#14B8A6] shadow-sm'
+                  : 'text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111820]'
               } ${isCollapsed ? 'justify-center px-0' : ''}`}
               title={isCollapsed ? item.name : undefined}
             >
               <div className="flex items-center space-x-3 truncate">
                 <Icon
-                  className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                    isActive ? 'text-teal-400' : 'text-[#727E89] group-hover:text-teal-400'
+                  className={`w-4 h-4 flex-shrink-0 transition-colors duration-[180ms] ${
+                    isActive ? 'text-[#14B8A6]' : 'text-[#64748B] group-hover:text-[#2DD4BF]'
                   }`}
                 />
                 {!isCollapsed && <span className="truncate">{item.name}</span>}
@@ -143,17 +143,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* User Profile & Sign Out Footer */}
       {!isCollapsed ? (
-        <div className="p-3 border-t border-white/10 bg-[#090B0E]/80">
-          <div className="p-2.5 rounded-xl bg-[rgba(23,28,34,0.88)] border border-white/10 flex items-center justify-between">
+        <div className="p-3 border-t border-[rgba(148,163,184,0.16)] bg-[#0B1016]/90">
+          <div className="p-2.5 rounded-xl bg-[#111820] border border-[rgba(148,163,184,0.16)] flex items-center justify-between">
             <div className="flex items-center space-x-2.5 truncate">
-              <div className="w-8 h-8 rounded-lg bg-[#0B0E12] text-teal-400 font-bold text-xs flex items-center justify-center border border-white/10 flex-shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-[#080D12] text-[#14B8A6] font-bold text-xs flex items-center justify-center border border-[rgba(148,163,184,0.16)] flex-shrink-0">
                 {user?.full_name?.charAt(0) || 'U'}
               </div>
               <div className="truncate">
-                <div className="text-xs font-semibold text-white truncate leading-tight">
+                <div className="text-xs font-semibold text-[#F8FAFC] truncate leading-tight">
                   {user?.full_name}
                 </div>
-                <div className="text-[10px] text-teal-400 font-mono truncate leading-tight">
+                <div className="text-[10px] text-[#14B8A6] font-mono truncate leading-tight mt-0.5">
                   {user?.role.replace('_', ' ')}
                 </div>
               </div>
@@ -161,7 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             <button
               onClick={logout}
-              className="p-1.5 text-[#727E89] hover:text-rose-400 rounded-lg hover:bg-rose-950/30 transition-colors"
+              className="p-1.5 text-[#94A3B8] hover:text-rose-400 rounded-lg hover:bg-rose-950/30 transition-colors"
               title="Sign Out"
             >
               <LogOut className="w-3.5 h-3.5" />
@@ -169,10 +169,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
       ) : (
-        <div className="p-3 border-t border-white/10 flex justify-center">
+        <div className="p-3 border-t border-[rgba(148,163,184,0.16)] flex justify-center bg-[#0B1016]/90">
           <button
             onClick={logout}
-            className="p-2 text-[#727E89] hover:text-rose-400 rounded-xl hover:bg-rose-950/30 transition-colors"
+            className="p-2 text-[#94A3B8] hover:text-rose-400 rounded-xl hover:bg-rose-950/30 transition-colors"
             title="Sign Out"
           >
             <LogOut className="w-4 h-4" />
