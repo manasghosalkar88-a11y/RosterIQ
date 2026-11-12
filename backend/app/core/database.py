@@ -63,17 +63,26 @@ def ensure_schema_columns() -> None:
         for table_name, cols in alterations.items():
             if table_name not in existing_tables:
                 continue
-            existing_cols = {c["name"] for c in inspector.get_columns(table_name)}
+            existing_cols = {c["name"]
+                             for c in inspector.get_columns(table_name)}
             for col_name, col_def in cols:
                 if col_name not in existing_cols:
-                    pg_def = col_def.replace("BOOLEAN NOT NULL DEFAULT 1", "BOOLEAN NOT NULL DEFAULT TRUE").replace(
-                        "BOOLEAN NOT NULL DEFAULT 0", "BOOLEAN NOT NULL DEFAULT FALSE"
-                    ) if engine.dialect.name == "postgresql" else col_def
-                    conn.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {col_name} {pg_def}"))
+                    pg_def = col_def
+
+                if engine.dialect.name == "postgresql":
+                    pg_def = (
+                        pg_def
+                        .replace("BOOLEAN NOT NULL DEFAULT 1", "BOOLEAN NOT NULL DEFAULT TRUE")
+                        .replace("BOOLEAN NOT NULL DEFAULT 0", "BOOLEAN NOT NULL DEFAULT FALSE")
+                        .replace("DATETIME", "TIMESTAMP")
+                    )
+                    conn.execute(
+                        text(f"ALTER TABLE {table_name} ADD COLUMN {col_name} {pg_def}"))
 
         if engine.dialect.name == "postgresql" and "simulation_scenarios" in existing_tables:
             for val in ("PENDING_APPROVAL", "APPROVED", "REJECTED"):
-                conn.execute(text(f"ALTER TYPE scenariostatus ADD VALUE IF NOT EXISTS '{val}'"))
+                conn.execute(
+                    text(f"ALTER TYPE scenariostatus ADD VALUE IF NOT EXISTS '{val}'"))
 
     hydrate_process_and_employee_qualifications()
 
@@ -115,7 +124,8 @@ def hydrate_process_and_employee_qualifications() -> None:
         db.flush()
 
         employees = db.query(Employee).all()
-        assigns = db.query(EmployeeAssignment).filter(EmployeeAssignment.is_active == True).all()
+        assigns = db.query(EmployeeAssignment).filter(
+            EmployeeAssignment.is_active == True).all()
         emp_proc_ids = {}
         for a in assigns:
             emp_proc_ids.setdefault(a.employee_id, set()).add(a.process_id)
