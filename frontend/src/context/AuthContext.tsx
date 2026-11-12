@@ -16,25 +16,36 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('rosteriq_user');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem('rosteriq_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      localStorage.removeItem('rosteriq_user');
+      return null;
+    }
   });
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('rosteriq_token'));
+  const [token, setToken] = useState<string | null>(() => {
+    const saved = localStorage.getItem('rosteriq_token');
+    return saved && saved.trim().length > 0 ? saved : null;
+  });
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Restore authenticated session on mount
   useEffect(() => {
     const verifyAuth = async () => {
       const storedToken = localStorage.getItem('rosteriq_token');
-      if (storedToken) {
+      if (storedToken && storedToken.trim().length > 0) {
         try {
           const res = await api.get<User>('/auth/me');
+          setToken(storedToken);
           setUser(res.data);
           localStorage.setItem('rosteriq_user', JSON.stringify(res.data));
         } catch (err) {
           console.warn('Session verification failed, clearing auth state.', err);
           logout();
         }
+      } else {
+        logout();
       }
       setIsLoading(false);
     };
@@ -52,18 +63,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const res = await api.post<AuthResponse>('/auth/login', { email, password });
-      const { access_token, user: userData } = res.data;
-      
-      setToken(access_token);
-      setUser(userData);
-      localStorage.setItem('rosteriq_token', access_token);
-      localStorage.setItem('rosteriq_user', JSON.stringify(userData));
-    } finally {
-      setIsLoading(false);
+    // Do not toggle global isLoading here; Login.tsx tracks isSubmitting locally
+    // so the Login form is not unmounted while authentication is in flight.
+    const res = await api.post<AuthResponse>('/auth/login', { email, password });
+    const { access_token, user: userData } = res.data || {};
+
+    if (!access_token || typeof access_token !== 'string' || !userData) {
+      throw new Error('Invalid authentication response from server.');
     }
+
+    localStorage.setItem('rosteriq_token', access_token);
+    localStorage.setItem('rosteriq_user', JSON.stringify(userData));
+    setToken(access_token);
+    setUser(userData);
   };
 
   const logout = () => {

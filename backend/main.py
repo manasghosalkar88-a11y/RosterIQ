@@ -2,14 +2,15 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.core.database import engine, Base
+from app.core.database import engine, Base, ensure_schema_columns
 import app.models  # Register all models for create_all
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Ensure all tables are created automatically on startup
+    # Ensure all tables and columns exist automatically on startup
     Base.metadata.create_all(bind=engine)
+    ensure_schema_columns()
     yield
 
 
@@ -54,7 +55,7 @@ def api_root():
     }
 
 
-from app.api.v1 import auth, employees, brands, processes, pods, seed, allocations, rules, leaves, holidays, roster, conflicts, changes, approvals, analytics, overview, notifications, settings as system_settings, simulator
+from app.api.v1 import auth, employees, brands, processes, pods, seed, allocations, rules, leaves, holidays, roster, conflicts, changes, approvals, analytics, overview, notifications, settings as system_settings, simulator, animation_controller
 
 # Mount API routers
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["Authentication"])
@@ -75,4 +76,5 @@ app.include_router(overview.router, prefix=f"{settings.API_V1_STR}", tags=["Over
 app.include_router(notifications.router, prefix=f"{settings.API_V1_STR}", tags=["Notifications"])
 app.include_router(simulator.router, prefix=f"{settings.API_V1_STR}", tags=["RosterIQ Impact Simulator"])
 app.include_router(system_settings.router, prefix=f"{settings.API_V1_STR}", tags=["Settings & System Diagnostics"])
+app.include_router(animation_controller.router, prefix=f"{settings.API_V1_STR}", tags=["3D Animation Controller"])
 app.include_router(seed.router, prefix=f"{settings.API_V1_STR}/seed", tags=["Seed & Demo"])

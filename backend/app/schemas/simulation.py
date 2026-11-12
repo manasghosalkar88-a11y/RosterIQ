@@ -2,7 +2,7 @@ from datetime import date, datetime
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 from app.models.simulation import SimulationType, ScenarioStatus
-from app.schemas.change_management import BackupRecommendationResponse
+from app.schemas.change_management import BackupRecommendationResponse, BackupEvaluationSummary
 
 
 class SimulationRequest(BaseModel):
@@ -17,6 +17,7 @@ class SimulationRequest(BaseModel):
     new_rule_type: Optional[str] = None
     new_min_headcount: Optional[int] = None
     reason: Optional[str] = None
+    expected_snapshot_hash: Optional[str] = None
 
 
 class AffectedEmployee(BaseModel):
@@ -81,6 +82,10 @@ class SimulationResultResponse(BaseModel):
     affected_dates: List[str] = []
     cascading_effects: List[str] = []
     backup_recommendations: List[BackupRecommendationResponse] = []
+    backup_evaluation_summary: Optional[BackupEvaluationSummary] = None
+    roster_snapshot_hash: Optional[str] = None
+    requires_approval: bool = False
+    required_approver_role: Optional[str] = None
     can_absorb_without_replacement: bool = False
     absorption_explanation: Optional[str] = None
     executive_summary: str
@@ -94,6 +99,11 @@ class SaveScenarioRequest(BaseModel):
     simulation_type: SimulationType
     parameters: Dict[str, Any]
     impact_summary: Dict[str, Any]
+    selected_backup_employee_id: Optional[int] = None
+    backup_recommendations: Optional[List[Dict[str, Any]]] = None
+    backup_evaluation_summary: Optional[Dict[str, Any]] = None
+    roster_snapshot_hash: Optional[str] = None
+    submit_for_approval: bool = False
 
 
 class ScenarioResponse(BaseModel):
@@ -105,7 +115,17 @@ class ScenarioResponse(BaseModel):
     status: str
     parameters: Dict[str, Any]
     impact_summary: Dict[str, Any]
+    candidate_ranking: Optional[Dict[str, Any]] = None
+    selected_backup_employee_id: Optional[int] = None
+    selected_backup_employee_name: Optional[str] = None
+    roster_snapshot_hash: Optional[str] = None
+    requires_approval: bool = False
+    required_approver_role: Optional[str] = None
     created_by_name: Optional[str] = None
+    reviewed_by_name: Optional[str] = None
+    review_comments: Optional[str] = None
+    reviewed_at: Optional[datetime] = None
+    applied_by_name: Optional[str] = None
     created_at: datetime
     applied_at: Optional[datetime] = None
 
@@ -113,6 +133,8 @@ class ScenarioResponse(BaseModel):
 class ApplyScenarioRequest(BaseModel):
     scenario_id: Optional[int] = None
     replacement_employee_id: Optional[int] = None
+    selected_backup_employee_id: Optional[int] = None
+    expected_snapshot_hash: Optional[str] = None
     simulation_params: Optional[Dict[str, Any]] = None
     override_reason: Optional[str] = None
     notes: Optional[str] = None
@@ -127,3 +149,6 @@ class ApplyScenarioResponse(BaseModel):
     remaining_conflicts_count: int
     audit_log_id: int
     applied_at: str
+    applied_by_name: Optional[str] = None
+    requires_approval: bool = False
+    approval_status: Optional[str] = None

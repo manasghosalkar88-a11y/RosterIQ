@@ -1,5 +1,4 @@
-import React, { useRef, useState } from 'react';
-import Crosshair from '../components/reactbits/Crosshair';
+import React, { useState } from 'react';
 import {
   CalendarDays,
   Users,
@@ -32,7 +31,6 @@ export interface LandingProps {
 }
 
 export const LandingPage: React.FC<LandingProps> = ({ onLogin, isAuthenticated = false }) => {
-  const heroRef = useRef<HTMLDivElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const scrollToSection = (id: string) => {
@@ -146,7 +144,7 @@ export const LandingPage: React.FC<LandingProps> = ({ onLogin, isAuthenticated =
   ];
 
   return (
-    <div className="relative min-h-screen text-[#F8FAFC] overflow-x-hidden selection:bg-[#14B8A6]/30 selection:text-white font-sans">
+    <div className="relative z-10 min-h-screen text-[#F8FAFC] overflow-x-hidden selection:bg-[#14B8A6]/30 selection:text-white font-sans">
       {/* 1. TOP NAVIGATION BAR */}
       <header className="sticky top-0 z-50 bg-[#0B1016]/85 backdrop-blur-[16px] border-b border-[rgba(148,163,184,0.16)] transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
@@ -294,27 +292,18 @@ export const LandingPage: React.FC<LandingProps> = ({ onLogin, isAuthenticated =
         )}
       </header>
 
-      {/* 2. HERO SECTION (WITH CROSSHAIR INTEGRATION) */}
+      {/* 2. HERO SECTION */}
       <section
         id="hero"
-        ref={heroRef}
         className="relative pt-20 pb-28 md:pt-28 md:pb-36 overflow-hidden"
       >
-        {/* React Bits Crosshair Component (Scoped strictly to hero container) */}
-        <Crosshair
-          containerRef={heroRef}
-          color="#14B8A6"
-          targetEffect="lock"
-          thickness={1}
-          opacity={0.8}
-          smoothing={0.35}
-          showCoordinates={false}
-          clickPulse={true}
-          hideCursor={false}
-          blendMode="normal"
+        {/* Subtle radial readability halo separating the 3D background canvas from centered typography */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(ellipse_64%_58%_at_50%_40%,rgba(5,5,5,0.82)_0%,rgba(5,5,5,0.52)_50%,transparent_82%)]"
         />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 text-center">
           {/* Eyebrow Pill */}
           <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[rgba(20,184,166,0.1)] border border-[#14B8A6]/30 text-[#2DD4BF] text-xs font-mono font-semibold mb-6 animate-fade-up">
             <span className="w-2 h-2 rounded-full bg-[#2DD4BF] animate-pulse" />
@@ -336,7 +325,7 @@ export const LandingPage: React.FC<LandingProps> = ({ onLogin, isAuthenticated =
           </p>
 
           {/* CTA Button Group */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          <div className="relative z-30 flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <button
               onClick={() => scrollToSection('platform')}
               className="btn-primary w-full sm:w-auto px-7 py-3.5 text-sm font-bold flex items-center justify-center space-x-2 shadow-lg shadow-[#14B8A6]/25"

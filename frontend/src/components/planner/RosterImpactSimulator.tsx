@@ -19,6 +19,7 @@ import {
   ArrowRight,
   ChevronRight,
   ShieldCheck,
+  ShieldAlert,
   Save,
   RefreshCw,
   UserCheck,
@@ -30,6 +31,8 @@ import {
   Check,
   RotateCcw,
   Sliders,
+  Clock,
+  Award,
 } from 'lucide-react';
 
 interface RosterImpactSimulatorProps {
@@ -93,11 +96,13 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [scenarioName, setScenarioName] = useState('');
   const [scenarioDescription, setScenarioDescription] = useState('');
+  const [submitForApproval, setSubmitForApproval] = useState(false);
 
   // Apply State
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
   const [applyNotes, setApplyNotes] = useState('');
+  const [applyError, setApplyError] = useState<string | null>(null);
 
   // Notification Toast
   const [notification, setNotification] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
@@ -178,10 +183,16 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
 
       const res = await api.post<SimulationResultResponse>('/simulator/simulate', payload);
       setSimulationResult(res.data);
+      setApplyError(null);
+      setSubmitForApproval(Boolean(res.data.requires_approval));
       setActiveTab('analysis');
 
-      // Auto-select top backup candidate if available
-      if (res.data.backup_recommendations && res.data.backup_recommendations.length > 0) {
+      // Auto-select top eligible backup candidate when replacement is needed (user can toggle/deselect freely)
+      if (
+        res.data.backup_recommendations &&
+        res.data.backup_recommendations.length > 0 &&
+        !res.data.can_absorb_without_replacement
+      ) {
         setSelectedBackup(res.data.backup_recommendations[0]);
       }
 
@@ -198,7 +209,9 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
   const handleLoadDemoSingleResource = () => {
     const glow = brands.find((b) => b.code === 'BRD-GLOW') || brands[0];
     const priya = employees.find((e) => e.employee_code === 'EMP006') || employees.find((e) => e.full_name.includes('Priya')) || employees[0];
-    const demoDate = `${year}-${String(month).padStart(2, '0')}-15`;
+    // Nov 15 in seed data has Priya already on APPROVED LEAVE; Nov 14 is an active WORKING day
+    const demoDay = year === 2026 && month === 11 ? '14' : '15';
+    const demoDate = `${year}-${String(month).padStart(2, '0')}-${demoDay}`;
 
     setSimulationType('EMPLOYEE_ABSENCE');
     setStartDate(demoDate);
@@ -221,7 +234,8 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
   const handleLoadDemoMultiResource = () => {
     const urban = brands.find((b) => b.code === 'BRD-URBAN') || brands.find((b) => b.name.includes('Urban')) || brands[0];
     const aditya = employees.find((e) => e.employee_code === 'EMP014') || employees.find((e) => e.full_name.includes('Aditya')) || employees[1];
-    const demoDate = `${year}-${String(month).padStart(2, '0')}-15`;
+    const demoDay = year === 2026 && month === 11 ? '14' : '15';
+    const demoDate = `${year}-${String(month).padStart(2, '0')}-${demoDay}`;
 
     setSimulationType('EMPLOYEE_ABSENCE');
     setStartDate(demoDate);
@@ -257,7 +271,7 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
           start_date: startDate,
           end_date: endDate,
           employee_id: employeeId,
-          target_employee_id: selectedBackup?.employee_id || targetEmployeeId,
+          target_employee_id: selectedBackup?.employee_id || targetEmployeeId || null,
           brand_id: brandId,
           process_id: processId,
           reason,
@@ -269,11 +283,24 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
           new_conflicts_count: simulationResult.newly_created_conflicts.length,
           can_absorb_without_replacement: simulationResult.can_absorb_without_replacement,
           top_replacement: selectedBackup?.full_name || null,
+          executive_summary: simulationResult.executive_summary,
         },
+        candidate_ranking: {
+          candidates: simulationResult.backup_recommendations,
+          summary: simulationResult.backup_evaluation_summary || null,
+        },
+        selected_backup_employee_id: selectedBackup?.employee_id || null,
+        roster_snapshot_hash: simulationResult.roster_snapshot_hash || null,
+        submit_for_approval: submitForApproval,
       };
 
-      await api.post('/simulator/scenarios', payload);
-      triggerNotification('success', 'Scenario saved successfully for operational review.');
+      const res = await api.post<ScenarioResponse>('/simulator/scenarios', payload);
+      triggerNotification(
+        'success',
+        res.data.status === 'PENDING_APPROVAL'
+          ? 'Scenario submitted to Approvals Queue for manager governance sign-off.'
+          : 'Scenario saved successfully with candidate snapshot for operational review.'
+      );
       setShowSaveModal(false);
       setScenarioName('');
       setScenarioDescription('');
@@ -289,6 +316,7 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
   const handleApplyScenario = async () => {
     if (!simulationResult) return;
     setIsApplying(true);
+    setApplyError(null);
 
     try {
       const payload = {
@@ -301,10 +329,12 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
         brand_id: brandId,
         process_id: processId,
         reason: applyNotes || reason || 'Applied via RosterIQ Impact Simulator',
+        expected_snapshot_hash: simulationResult.roster_snapshot_hash || undefined,
       };
 
       const res = await api.post<ApplyScenarioResponse>('/simulator/apply', payload);
       setShowApplyModal(false);
+      setApplyError(null);
       triggerNotification('success', `Scenario applied to live roster! ${res.data.entries_updated} shifts mutated.`);
 
       if (onRosterUpdated) {
@@ -312,7 +342,9 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
       }
       loadSavedScenarios();
     } catch (err: any) {
-      triggerNotification('error', err.response?.data?.detail || 'Failed to apply scenario.');
+      const msg = err.response?.data?.detail || 'Failed to apply scenario.';
+      setApplyError(msg);
+      triggerNotification('error', msg);
     } finally {
       setIsApplying(false);
     }
@@ -322,10 +354,12 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
   const handleApplySavedScenario = async (scenario: ScenarioResponse) => {
     setIsApplying(true);
     try {
-      await api.post<ApplyScenarioResponse>(`/simulator/scenarios/${scenario.id}/apply`, {
+      const res = await api.post<ApplyScenarioResponse>(`/simulator/scenarios/${scenario.id}/apply`, {
+        selected_backup_employee_id: scenario.selected_backup_employee_id || undefined,
+        expected_snapshot_hash: scenario.roster_snapshot_hash || undefined,
         notes: `Applied saved scenario #${scenario.id} (${scenario.name})`,
       });
-      triggerNotification('success', `Saved scenario #${scenario.id} applied to live roster!`);
+      triggerNotification('success', `Saved scenario #${scenario.id} applied to live roster (${res.data.entries_updated} shifts updated)!`);
       if (onRosterUpdated) {
         onRosterUpdated();
       }
@@ -934,100 +968,231 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
           {/* TAB 3: SMART BACKUP RECOMMENDATIONS */}
           {activeTab === 'backups' && simulationResult && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-800">Smart Backup Candidate Pool</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Ranked candidates evaluated by pod proximity, skill certifications, current workload, and labor laws.
+                  <h3 className="text-sm font-bold text-[#F8FAFC]">Smart Backup Candidate Pool</h3>
+                  <p className="text-xs text-[#94A3B8] mt-0.5">
+                    Ranked candidates evaluated by skill match (35%), availability (25%), pod proximity (15%), workload (15%), and certifications (10%).
                   </p>
                 </div>
-                {selectedBackup && (
-                  <span className="px-2.5 py-1 rounded-full bg-teal-100 text-teal-800 text-xs font-bold border border-teal-200">
-                    Selected: {selectedBackup.full_name}
-                  </span>
-                )}
+                <div className="flex items-center space-x-2">
+                  {selectedBackup ? (
+                    <>
+                      <span className="px-2.5 py-1 rounded-full bg-teal-950/80 text-[#2DD4BF] text-xs font-bold border border-[#14B8A6]/40">
+                        Selected: {selectedBackup.full_name}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBackup(null)}
+                        className="px-2.5 py-1 rounded-full bg-[#111820] hover:bg-[#1E293B] text-[#CBD5E1] text-[11px] font-semibold border border-[rgba(148,163,184,0.22)] transition-colors"
+                      >
+                        Clear Selection
+                      </button>
+                    </>
+                  ) : (
+                    <span className="px-2.5 py-1 rounded-full bg-[#111820] text-[#94A3B8] text-[11px] font-medium border border-[rgba(148,163,184,0.18)]">
+                      Optional / None Selected
+                    </span>
+                  )}
+                </div>
               </div>
 
+              {/* Evaluation Context & Skill/Cert Requirements */}
+              {simulationResult.backup_evaluation_summary && (
+                <div className="p-3.5 rounded-2xl bg-[#0B0E12]/90 border border-[rgba(148,163,184,0.16)] space-y-2 text-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-2 text-[#CBD5E1]">
+                      <span className="font-semibold text-[#94A3B8]">Evaluated:</span>
+                      <span className="px-2 py-0.5 rounded-md bg-[#141A22] font-mono text-[#F8FAFC]">
+                        {simulationResult.backup_evaluation_summary.total_evaluated} active staff
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md bg-emerald-950/60 text-emerald-300 border border-emerald-500/30 font-mono">
+                        {simulationResult.backup_evaluation_summary.eligible_count} eligible
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md bg-amber-950/50 text-amber-300 border border-amber-500/30 font-mono">
+                        {simulationResult.backup_evaluation_summary.excluded_count} excluded
+                      </span>
+                    </div>
+                    {simulationResult.requires_approval && (
+                      <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-amber-950/60 text-amber-300 border border-amber-500/30 text-[10px] font-bold">
+                        <ShieldAlert className="w-3 h-3" />
+                        <span>Approval Required: {simulationResult.required_approver_role || 'OPS_MANAGER'}</span>
+                      </span>
+                    )}
+                  </div>
+
+                  {(simulationResult.backup_evaluation_summary.required_skills.length > 0 ||
+                    simulationResult.backup_evaluation_summary.mandatory_certifications.length > 0) && (
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-[rgba(148,163,184,0.1)] text-[10px]">
+                      {simulationResult.backup_evaluation_summary.required_skills.map((sk) => (
+                        <span key={sk} className="px-2 py-0.5 rounded bg-teal-950/50 text-[#2DD4BF] border border-[#14B8A6]/25 font-mono">
+                          Skill: {sk}
+                        </span>
+                      ))}
+                      {simulationResult.backup_evaluation_summary.mandatory_certifications.map((cert) => (
+                        <span key={cert} className="px-2 py-0.5 rounded bg-sky-950/50 text-sky-300 border border-sky-500/25 font-mono">
+                          Cert: {cert}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {simulationResult.can_absorb_without_replacement && (
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center space-x-2">
-                  <Info className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                <div className="p-3 rounded-xl bg-[#0E161E] border border-sky-500/25 text-xs text-[#CBD5E1] flex items-center space-x-2">
+                  <Info className="w-4 h-4 text-sky-400 flex-shrink-0" />
                   <span>
                     Note: This account is multi-resource and self-absorbs. Selecting a backup below is optional.
                   </span>
                 </div>
               )}
 
-              {simulationResult.backup_recommendations.length === 0 ? (
-                <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
-                  <UserCheck className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-xs font-semibold text-slate-600">No eligible backup candidates found.</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    All candidates in this pod are either currently scheduled or exceed consecutive day limits.
-                  </p>
+              {isSimulating ? (
+                <div className="text-center py-12 bg-[#0B0E12]/70 rounded-2xl border border-[rgba(148,163,184,0.16)]">
+                  <RefreshCw className="w-7 h-7 text-[#14B8A6] mx-auto mb-2 animate-spin" />
+                  <p className="text-xs font-semibold text-[#F8FAFC]">Evaluating eligible backup pool...</p>
+                  <p className="text-[11px] text-[#94A3B8] mt-0.5">Checking schedules, certifications, weekly hours, and rest periods.</p>
+                </div>
+              ) : simulationResult.backup_recommendations.length === 0 ? (
+                <div className="p-6 bg-[#0B0E12]/80 rounded-2xl border border-dashed border-[rgba(148,163,184,0.28)] space-y-4">
+                  <div className="text-center space-y-1">
+                    <UserCheck className="w-8 h-8 text-amber-400 mx-auto mb-1" />
+                    <p className="text-xs font-bold text-[#F8FAFC]">No eligible backup candidates found.</p>
+                    <p className="text-[11px] text-[#94A3B8] max-w-lg mx-auto">
+                      All {simulationResult.backup_evaluation_summary?.total_evaluated ?? 0} active employees were excluded by schedule availability, mandatory certification requirements, or labor compliance limits.
+                    </p>
+                  </div>
+
+                  {simulationResult.backup_evaluation_summary &&
+                    simulationResult.backup_evaluation_summary.exclusion_reasons.length > 0 && (
+                      <div className="space-y-2 pt-2 border-t border-[rgba(148,163,184,0.14)]">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-[#94A3B8]">
+                          Live Exclusion Breakdown ({simulationResult.backup_evaluation_summary.excluded_count} excluded)
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {simulationResult.backup_evaluation_summary.exclusion_reasons.map((ex) => (
+                            <div
+                              key={ex.code}
+                              className="p-2.5 rounded-xl bg-[#111820] border border-[rgba(148,163,184,0.16)] text-[11px]"
+                            >
+                              <div className="flex items-center justify-between font-semibold text-[#F8FAFC]">
+                                <span>{ex.label}</span>
+                                <span className="px-1.5 py-0.5 rounded bg-rose-950/60 text-rose-300 border border-rose-500/30 font-mono text-[10px]">
+                                  {ex.count}
+                                </span>
+                              </div>
+                              <div className="text-[10px] text-[#94A3B8] mt-0.5">{ex.description}</div>
+                              {ex.employee_names.length > 0 && (
+                                <div className="text-[10px] text-[#CBD5E1] mt-1 truncate">
+                                  e.g. {ex.employee_names.join(', ')}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {simulationResult.backup_recommendations.map((cand) => {
+                  {simulationResult.backup_recommendations.map((cand, idx) => {
                     const isSelected = selectedBackup?.employee_id === cand.employee_id;
                     return (
                       <div
                         key={cand.employee_id}
-                        onClick={() => setSelectedBackup(cand)}
+                        onClick={() => setSelectedBackup(isSelected ? null : cand)}
                         className={`p-4 rounded-2xl border cursor-pointer transition-all ${
                           isSelected
-                            ? 'bg-teal-50/50 border-teal-500 shadow-md ring-2 ring-teal-500/20'
-                            : 'bg-white border-slate-200 hover:border-slate-300 shadow-subtle'
+                            ? 'bg-teal-950/35 border-[#14B8A6] shadow-md ring-1 ring-[#14B8A6]/40'
+                            : 'bg-[#0E1319]/90 border-[rgba(148,163,184,0.18)] hover:border-[#14B8A6]/50'
                         }`}
                       >
-                        <div className="flex items-start justify-between">
+                        <div className="flex items-start justify-between gap-3">
                           <div className="flex items-start space-x-3">
                             <div
-                              className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs ${
+                              className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center font-bold ${
                                 isSelected
-                                  ? 'bg-teal-600 text-white'
-                                  : 'bg-slate-100 text-slate-700'
+                                  ? 'bg-[#14B8A6] text-white'
+                                  : 'bg-[#171E26] text-[#2DD4BF] border border-[rgba(148,163,184,0.2)]'
                               }`}
                             >
-                              {cand.suitability_score}%
+                              <span className="text-[9px] leading-none opacity-80">#{idx + 1}</span>
+                              <span className="text-xs leading-tight">{cand.suitability_score}%</span>
                             </div>
                             <div>
-                              <div className="flex items-center space-x-2">
-                                <span className="font-bold text-xs text-slate-900">{cand.full_name}</span>
-                                <span className="text-[11px] font-mono text-slate-500">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-bold text-xs text-[#F8FAFC]">{cand.full_name}</span>
+                                <span className="text-[11px] font-mono text-[#94A3B8]">
                                   ({cand.employee_code})
                                 </span>
-                                <span className="px-2 py-0.2 rounded-full bg-slate-100 text-slate-600 text-[10px] font-semibold">
+                                <span className="px-2 py-0.5 rounded-full bg-[#171E26] text-[#CBD5E1] border border-[rgba(148,163,184,0.18)] text-[10px] font-semibold">
                                   {cand.pod_name}
                                 </span>
+                                <span className="px-2 py-0.5 rounded-full bg-[#111820] text-[#94A3B8] text-[10px] font-mono">
+                                  {cand.current_status}
+                                </span>
                               </div>
-                              <p className="text-[11px] text-slate-500 mt-0.5">{cand.designation}</p>
+                              <p className="text-[11px] text-[#94A3B8] mt-0.5">{cand.designation}</p>
                             </div>
                           </div>
 
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2 flex-shrink-0">
                             {cand.requires_comp_off && (
-                              <span className="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 text-[10px] font-bold">
-                                +1 Comp-Off Credit
+                              <span className="px-2 py-0.5 rounded-full bg-sky-950/60 text-sky-300 border border-sky-500/30 text-[10px] font-bold">
+                                +1 Comp-Off
                               </span>
                             )}
-                            <div
-                              className={`w-5 h-5 rounded-full flex items-center justify-center border ${
+                            <span
+                              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border inline-flex items-center space-x-1 ${
                                 isSelected
-                                  ? 'bg-teal-600 border-teal-600 text-white'
-                                  : 'border-slate-300'
+                                  ? 'bg-[#14B8A6] border-[#14B8A6] text-white'
+                                  : 'bg-[#171E26] border-[rgba(148,163,184,0.25)] text-[#CBD5E1]'
                               }`}
                             >
-                              {isSelected && <Check className="w-3.5 h-3.5" />}
-                            </div>
+                              {isSelected ? <Check className="w-3 h-3" /> : null}
+                              <span>{isSelected ? 'Selected' : 'Select Backup'}</span>
+                            </span>
                           </div>
                         </div>
 
+                        {/* Shift window, Workload & Compliance metrics */}
+                        <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
+                          <div className="px-2.5 py-1.5 rounded-lg bg-[#090C10] border border-[rgba(148,163,184,0.14)] flex items-center space-x-1.5 text-[#CBD5E1]">
+                            <Clock className="w-3 h-3 text-[#2DD4BF]" />
+                            <span>Shift: {cand.available_shift || '09:00 - 18:00'}</span>
+                          </div>
+                          <div className="px-2.5 py-1.5 rounded-lg bg-[#090C10] border border-[rgba(148,163,184,0.14)] text-[#CBD5E1]">
+                            Hours: <span className="font-mono text-[#F8FAFC]">{cand.current_weekly_hours ?? 0}h</span> →{' '}
+                            <span className="font-mono text-[#2DD4BF]">{cand.projected_weekly_hours ?? 8}h/{cand.max_weekly_hours ?? 48}h</span>
+                          </div>
+                          <div className="px-2.5 py-1.5 rounded-lg bg-[#090C10] border border-[rgba(148,163,184,0.14)] text-[#CBD5E1]">
+                            Streak After: <span className="font-mono text-[#F8FAFC]">{cand.consecutive_days_after}/{cand.max_consecutive_days ?? 6}d</span>
+                          </div>
+                          <div className="px-2.5 py-1.5 rounded-lg bg-[#090C10] border border-[rgba(148,163,184,0.14)] flex items-center space-x-1 text-emerald-300">
+                            <Award className="w-3 h-3" />
+                            <span>
+                              Skill {cand.skill_match_pct ?? 100}% • {cand.certification_status || 'VERIFIED'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {cand.score_breakdown && (
+                          <div className="mt-2 grid grid-cols-5 gap-1.5 text-[9px] text-[#94A3B8] font-mono">
+                            <div className="px-1.5 py-1 rounded bg-[#090C10]/80 text-center">Skill {cand.score_breakdown.skill_score}/35</div>
+                            <div className="px-1.5 py-1 rounded bg-[#090C10]/80 text-center">Avail {cand.score_breakdown.availability_score}/25</div>
+                            <div className="px-1.5 py-1 rounded bg-[#090C10]/80 text-center">Pod {cand.score_breakdown.pod_score}/15</div>
+                            <div className="px-1.5 py-1 rounded bg-[#090C10]/80 text-center">Load {cand.score_breakdown.workload_score}/15</div>
+                            <div className="px-1.5 py-1 rounded bg-[#090C10]/80 text-center">Cert {cand.score_breakdown.certification_score}/10</div>
+                          </div>
+                        )}
+
                         {/* Match Reasons */}
-                        <div className="mt-3 flex flex-wrap gap-1.5">
+                        <div className="mt-2.5 flex flex-wrap gap-1.5">
                           {cand.match_reasons.map((r, i) => (
                             <span
                               key={i}
-                              className="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-600 text-[10px] font-medium"
+                              className="px-2 py-0.5 rounded-md bg-[#111820] border border-[rgba(148,163,184,0.16)] text-[#CBD5E1] text-[10px] font-medium"
                             >
                               ✓ {r}
                             </span>
@@ -1046,82 +1211,105 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-800">Saved Scenario Review Log</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Browse previously saved impact scenarios or apply an approved simulation.
+                  <h3 className="text-sm font-bold text-[#F8FAFC]">Saved Scenario Review Log</h3>
+                  <p className="text-xs text-[#94A3B8] mt-0.5">
+                    Browse saved impact scenarios with candidate rankings or apply approved simulations.
                   </p>
                 </div>
                 <button
                   onClick={loadSavedScenarios}
-                  className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-[#171E26] text-[#94A3B8] hover:text-[#F8FAFC] transition-colors"
                 >
                   <RefreshCw className={`w-4 h-4 ${isLoadingScenarios ? 'animate-spin' : ''}`} />
                 </button>
               </div>
 
               {savedScenarios.length === 0 ? (
-                <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
-                  <Save className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-xs font-semibold text-slate-600">No saved scenarios yet.</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    Run a simulation and click "Save Scenario" to preserve it for stakeholder review.
+                <div className="text-center py-12 bg-[#0B0E12]/70 rounded-2xl border border-dashed border-[rgba(148,163,184,0.22)]">
+                  <Save className="w-8 h-8 text-[#64748B] mx-auto mb-2" />
+                  <p className="text-xs font-semibold text-[#CBD5E1]">No saved scenarios yet.</p>
+                  <p className="text-[11px] text-[#94A3B8] mt-0.5">
+                    Run a simulation and click "Save for Review" to preserve candidate rankings for stakeholder review.
                   </p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {savedScenarios.map((sc) => (
-                    <div
-                      key={sc.id}
-                      className="p-4 rounded-2xl bg-white border border-slate-200 shadow-subtle space-y-2.5"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <span className="font-bold text-xs text-slate-900">{sc.name}</span>
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                sc.status === 'APPLIED'
-                                  ? 'bg-emerald-100 text-emerald-800'
-                                  : sc.status === 'SAVED'
-                                  ? 'bg-sky-100 text-sky-800'
-                                  : 'bg-slate-100 text-slate-700'
-                              }`}
-                            >
-                              {sc.status}
-                            </span>
+                  {savedScenarios.map((sc) => {
+                    const isBlockedApproval = sc.status === 'PENDING_APPROVAL' || sc.status === 'REJECTED';
+                    return (
+                      <div
+                        key={sc.id}
+                        className="p-4 rounded-2xl bg-[#0E1319]/90 border border-[rgba(148,163,184,0.18)] space-y-2.5"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="font-bold text-xs text-[#F8FAFC]">{sc.name}</span>
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                                  sc.status === 'APPLIED'
+                                    ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/30'
+                                    : sc.status === 'APPROVED'
+                                    ? 'bg-teal-950/60 text-[#2DD4BF] border-[#14B8A6]/35'
+                                    : sc.status === 'PENDING_APPROVAL'
+                                    ? 'bg-amber-950/60 text-amber-300 border-amber-500/30'
+                                    : sc.status === 'REJECTED'
+                                    ? 'bg-rose-950/60 text-rose-300 border-rose-500/30'
+                                    : 'bg-sky-950/60 text-sky-300 border-sky-500/30'
+                                }`}
+                              >
+                                {sc.status}
+                              </span>
+                            </div>
+                            {sc.description && (
+                              <p className="text-[11px] text-[#94A3B8] mt-0.5">{sc.description}</p>
+                            )}
+                            {sc.selected_backup_employee_name && (
+                              <p className="text-[11px] text-[#2DD4BF] mt-1 font-semibold">
+                                Selected Backup: {sc.selected_backup_employee_name}
+                              </p>
+                            )}
+                            {sc.requires_approval && sc.status === 'PENDING_APPROVAL' && (
+                              <p className="text-[10px] text-amber-300 mt-0.5">
+                                Awaiting {sc.required_approver_role || 'OPS_MANAGER'} decision in Approvals Queue.
+                              </p>
+                            )}
+                            {sc.review_comments && (
+                              <p className="text-[10px] text-[#94A3B8] italic mt-0.5">
+                                Review note ({sc.reviewed_by_name || 'Reviewer'}): "{sc.review_comments}"
+                              </p>
+                            )}
                           </div>
-                          {sc.description && (
-                            <p className="text-[11px] text-slate-500 mt-0.5">{sc.description}</p>
+
+                          {sc.status !== 'APPLIED' && !isBlockedApproval && (
+                            <button
+                              onClick={() => handleApplySavedScenario(sc)}
+                              disabled={isApplying}
+                              className="px-3 py-1.5 rounded-xl bg-[#14B8A6] hover:bg-[#0D9488] text-white text-xs font-semibold flex items-center space-x-1.5 disabled:opacity-50 flex-shrink-0"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                              <span>Apply to Roster</span>
+                            </button>
                           )}
                         </div>
 
-                        {sc.status !== 'APPLIED' && (
-                          <button
-                            onClick={() => handleApplySavedScenario(sc)}
-                            disabled={isApplying}
-                            className="px-3 py-1.5 rounded-xl bg-app-sidebar hover:bg-slate-800 text-white text-xs font-semibold shadow-xs flex items-center space-x-1.5 disabled:opacity-50"
-                          >
-                            <Check className="w-3.5 h-3.5 text-teal-400" />
-                            <span>Apply to Roster</span>
-                          </button>
-                        )}
+                        <div className="text-[11px] text-[#94A3B8] flex flex-wrap items-center gap-3 pt-1.5 border-t border-[rgba(148,163,184,0.12)]">
+                          <span>Created by {sc.created_by_name || 'Operations Lead'}</span>
+                          <span>•</span>
+                          <span>{new Date(sc.created_at).toLocaleDateString()}</span>
+                          {sc.applied_at && (
+                            <>
+                              <span>•</span>
+                              <span className="text-emerald-400 font-medium">
+                                Applied on {new Date(sc.applied_at).toLocaleDateString()}
+                                {sc.applied_by_name ? ` by ${sc.applied_by_name}` : ''}
+                              </span>
+                            </>
+                          )}
+                        </div>
                       </div>
-
-                      <div className="text-[11px] text-slate-500 flex items-center space-x-3 pt-1 border-t border-slate-100">
-                        <span>Created by {sc.created_by_name || 'Operations Lead'}</span>
-                        <span>•</span>
-                        <span>{new Date(sc.created_at).toLocaleDateString()}</span>
-                        {sc.applied_at && (
-                          <>
-                            <span>•</span>
-                            <span className="text-emerald-700 font-medium">
-                              Applied on {new Date(sc.applied_at).toLocaleDateString()}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -1129,11 +1317,11 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
         </div>
 
         {/* Drawer Footer Actions */}
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <div className="px-6 py-4 bg-[#0B0E12] border-t border-white/10 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <button
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition-colors"
+              className="px-4 py-2.5 rounded-xl bg-[#171E26] border border-[rgba(148,163,184,0.2)] text-[#CBD5E1] font-semibold text-xs hover:bg-[#1E293B] transition-colors"
             >
               Close
             </button>
@@ -1141,9 +1329,9 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
             {simulationResult && (
               <button
                 onClick={() => setShowSaveModal(true)}
-                className="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-100 transition-colors flex items-center space-x-1.5"
+                className="px-4 py-2.5 rounded-xl bg-[#171E26] border border-[rgba(148,163,184,0.2)] text-[#F8FAFC] font-semibold text-xs hover:bg-[#1E293B] transition-colors flex items-center space-x-1.5"
               >
-                <Save className="w-3.5 h-3.5 text-slate-500" />
+                <Save className="w-3.5 h-3.5 text-[#2DD4BF]" />
                 <span>Save for Review</span>
               </button>
             )}
@@ -1151,9 +1339,12 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
 
           {simulationResult && (
             <button
-              onClick={() => setShowApplyModal(true)}
+              onClick={() => {
+                setApplyError(null);
+                setShowApplyModal(true);
+              }}
               disabled={isApplying}
-              className="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md shadow-teal-600/20 transition-all flex items-center space-x-2 disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl bg-[#14B8A6] hover:bg-[#0D9488] text-white font-bold text-xs shadow-md shadow-teal-500/20 transition-all flex items-center space-x-2 disabled:opacity-50"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Apply Scenario to Live Roster</span>
@@ -1164,53 +1355,74 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
 
       {/* Save Scenario Modal */}
       {showSaveModal && (
-        <div className="fixed inset-0 z-60 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 shadow-2xl">
+        <div className="fixed inset-0 z-60 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0E1319] rounded-2xl border border-white/15 max-w-md w-full p-6 shadow-2xl text-[#F8FAFC]">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-bold text-slate-900">Save Scenario for Review</h3>
-              <button onClick={() => setShowSaveModal(false)} className="text-slate-400 hover:text-slate-600">
+              <h3 className="text-base font-bold text-[#F8FAFC]">Save Scenario for Review</h3>
+              <button onClick={() => setShowSaveModal(false)} className="text-[#94A3B8] hover:text-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSaveScenario} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Scenario Name</label>
+                <label className="block text-xs font-bold text-[#CBD5E1] mb-1">Scenario Name</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g., Priya Sharma Medical Leave & Backup"
+                  placeholder="e.g., Priya Sharma Absence & Ranked Backup Plan"
                   value={scenarioName}
                   onChange={(e) => setScenarioName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 rounded-xl bg-[#080B0F] border border-[rgba(148,163,184,0.22)] text-xs font-semibold text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#14B8A6]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Description / Notes</label>
+                <label className="block text-xs font-bold text-[#CBD5E1] mb-1">Description / Notes</label>
                 <textarea
                   rows={3}
                   placeholder="Additional context for operations managers..."
                   value={scenarioDescription}
                   onChange={(e) => setScenarioDescription(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-2 rounded-xl bg-[#080B0F] border border-[rgba(148,163,184,0.22)] text-xs text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#14B8A6]"
                 />
               </div>
+
+              {selectedBackup && (
+                <div className="p-2.5 rounded-xl bg-teal-950/40 border border-[#14B8A6]/30 text-xs text-[#2DD4BF]">
+                  Saving selected backup: <strong>{selectedBackup.full_name}</strong> ({selectedBackup.suitability_score}% match)
+                </div>
+              )}
+
+              <label className="flex items-start space-x-2.5 text-xs text-[#CBD5E1] cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={submitForApproval}
+                  onChange={(e) => setSubmitForApproval(e.target.checked)}
+                  className="mt-0.5 rounded border-[rgba(148,163,184,0.3)] bg-[#080B0F] text-[#14B8A6] focus:ring-[#14B8A6]"
+                />
+                <span>
+                  Submit directly to <strong>Approvals Queue</strong>
+                  {simulationResult?.requires_approval
+                    ? ` (${simulationResult.required_approver_role || 'OPS_MANAGER'} approval required by policy)`
+                    : ' for peer review before roster mutation'}
+                </span>
+              </label>
 
               <div className="flex justify-end space-x-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowSaveModal(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  className="px-4 py-2 rounded-xl bg-[#171E26] border border-[rgba(148,163,184,0.2)] text-xs font-semibold text-[#CBD5E1] hover:bg-[#1E293B]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSavingScenario}
-                  className="px-4 py-2 rounded-xl bg-app-primaryAccent hover:bg-app-primaryAccentHover text-white text-xs font-bold shadow-xs disabled:opacity-50"
+                  className="px-4 py-2 rounded-xl bg-[#14B8A6] hover:bg-[#0D9488] text-white text-xs font-bold shadow-xs disabled:opacity-50"
                 >
-                  {isSavingScenario ? 'Saving...' : 'Save Scenario'}
+                  {isSavingScenario ? 'Saving...' : submitForApproval ? 'Submit for Approval' : 'Save Scenario'}
                 </button>
               </div>
             </form>
@@ -1220,48 +1432,54 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
 
       {/* Confirmation Modal to Apply Scenario to Live Roster */}
       {showApplyModal && (
-        <div className="fixed inset-0 z-60 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center space-x-3 text-amber-600">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-amber-600" />
+        <div className="fixed inset-0 z-60 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0E1319] rounded-2xl border border-white/15 max-w-lg w-full p-6 shadow-2xl space-y-4 text-[#F8FAFC]">
+            <div className="flex items-center space-x-3 text-amber-400">
+              <div className="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-500/30 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-amber-400" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">Confirm Live Roster Mutation</h3>
-                <p className="text-xs text-slate-500">
-                  This action will persist the simulated changes to actual monthly schedule records.
+                <h3 className="text-base font-bold text-[#F8FAFC]">Confirm Live Roster Mutation</h3>
+                <p className="text-xs text-[#94A3B8]">
+                  This action revalidates live constraints and persists changes transactionally.
                 </p>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs text-slate-700">
+            {applyError && (
+              <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-500/40 text-xs text-rose-200">
+                {applyError}
+              </div>
+            )}
+
+            <div className="p-4 rounded-xl bg-[#080B0F] border border-[rgba(148,163,184,0.18)] space-y-2 text-xs text-[#CBD5E1]">
               <div className="flex justify-between font-medium">
-                <span className="text-slate-500">Target Shift Date:</span>
-                <span className="font-bold text-slate-800">{startDate}</span>
+                <span className="text-[#94A3B8]">Target Shift Date:</span>
+                <span className="font-bold text-[#F8FAFC]">
+                  {startDate}{endDate && endDate !== startDate ? ` → ${endDate}` : ''}
+                </span>
               </div>
               <div className="flex justify-between font-medium">
-                <span className="text-slate-500">Operation:</span>
-                <span className="font-bold text-slate-800">{simulationType}</span>
+                <span className="text-[#94A3B8]">Operation:</span>
+                <span className="font-bold text-[#F8FAFC]">{simulationType}</span>
               </div>
-              {selectedBackup && (
-                <div className="flex justify-between font-medium">
-                  <span className="text-slate-500">Assigned Replacement:</span>
-                  <span className="font-bold text-teal-700">
-                    {selectedBackup.full_name} ({selectedBackup.employee_code})
-                  </span>
-                </div>
-              )}
               <div className="flex justify-between font-medium">
-                <span className="text-slate-500">Expected Live Coverage:</span>
-                <span className="font-bold text-emerald-600">{simulationResult?.coverage_after}%</span>
+                <span className="text-[#94A3B8]">Assigned Replacement:</span>
+                <span className={`font-bold ${selectedBackup ? 'text-[#2DD4BF]' : 'text-amber-300'}`}>
+                  {selectedBackup ? `${selectedBackup.full_name} (${selectedBackup.employee_code})` : 'None (Optional / Uncovered)'}
+                </span>
               </div>
-              <div className="pt-1 text-[11px] text-slate-500 border-t border-slate-200">
-                ✓ Mandatory constraints will be revalidated • Immutable audit log record created.
+              <div className="flex justify-between font-medium">
+                <span className="text-[#94A3B8]">Expected Live Coverage:</span>
+                <span className="font-bold text-emerald-400">{simulationResult?.coverage_after}%</span>
+              </div>
+              <div className="pt-1.5 text-[11px] text-[#94A3B8] border-t border-[rgba(148,163,184,0.12)]">
+                ✓ Snapshot hash & mandatory rules revalidated • Immutable audit log & version created.
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-[#CBD5E1] mb-1">
                 Approval Justification (Audit Record)
               </label>
               <input
@@ -1269,7 +1487,7 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
                 value={applyNotes}
                 onChange={(e) => setApplyNotes(e.target.value)}
                 placeholder="Approved by Operations Manager after simulation review"
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-3 py-2 rounded-xl bg-[#080B0F] border border-[rgba(148,163,184,0.22)] text-xs font-semibold text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#14B8A6]"
               />
             </div>
 
@@ -1277,7 +1495,7 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
               <button
                 type="button"
                 onClick={() => setShowApplyModal(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                className="px-4 py-2 rounded-xl bg-[#171E26] border border-[rgba(148,163,184,0.2)] text-xs font-semibold text-[#CBD5E1] hover:bg-[#1E293B]"
               >
                 Cancel
               </button>
@@ -1285,7 +1503,7 @@ export const RosterImpactSimulator: React.FC<RosterImpactSimulatorProps> = ({
                 type="button"
                 onClick={handleApplyScenario}
                 disabled={isApplying}
-                className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-md shadow-teal-600/20 disabled:opacity-50 flex items-center space-x-1.5"
+                className="px-5 py-2 rounded-xl bg-[#14B8A6] hover:bg-[#0D9488] text-white text-xs font-bold shadow-md shadow-teal-500/20 disabled:opacity-50 flex items-center space-x-1.5"
               >
                 <Check className="w-4 h-4" />
                 <span>{isApplying ? 'Applying to Live Roster...' : 'Confirm & Apply Scenario'}</span>

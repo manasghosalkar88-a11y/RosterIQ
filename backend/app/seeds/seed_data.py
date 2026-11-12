@@ -9,8 +9,9 @@ Seeds:
 - Relational Employee Assignments (Primary and Backup allocations)
 """
 from datetime import date
+import json
 from sqlalchemy.orm import Session
-from app.core.database import SessionLocal, engine
+from app.core.database import SessionLocal, engine, ensure_schema_columns
 from app.models import (
     Pod, Employee, EmploymentStatus, Brand, Process,
     BrandProcessRule, OperatingRuleType,
@@ -324,6 +325,7 @@ def seed_database(db: Session):
             ))
 
     db.commit()
+    ensure_schema_columns()
 
     # Automatically generate initial rosters for current month and assessment demo month
     from app.engine.scheduler import SchedulingEngine

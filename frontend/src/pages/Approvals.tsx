@@ -10,6 +10,8 @@ import {
   X,
   CalendarCheck,
   Award,
+  Sliders,
+  ShieldAlert,
 } from 'lucide-react';
 
 export const ApprovalsPage: React.FC = () => {
@@ -21,7 +23,7 @@ export const ApprovalsPage: React.FC = () => {
 
   // Filters
   const [selectedPodId, setSelectedPodId] = useState<string>('ALL');
-  const [typeFilter, setTypeFilter] = useState<'ALL' | 'LEAVE' | 'COMPOFF'>('ALL');
+  const [typeFilter, setTypeFilter] = useState<'ALL' | 'LEAVE' | 'COMPOFF' | 'SIMULATION_SCENARIO'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Selection for Batch Actions
@@ -78,9 +80,12 @@ export const ApprovalsPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      const endpoint = reviewTarget.item.item_type === 'LEAVE'
-        ? `/approvals/leave/${reviewTarget.item.id}`
-        : `/approvals/compoff/${reviewTarget.item.id}`;
+      const endpoint =
+        reviewTarget.item.item_type === 'LEAVE'
+          ? `/approvals/leave/${reviewTarget.item.id}`
+          : reviewTarget.item.item_type === 'SIMULATION_SCENARIO'
+          ? `/approvals/scenario/${reviewTarget.item.id}`
+          : `/approvals/compoff/${reviewTarget.item.id}`;
 
       await api.put(endpoint, {
         status: reviewTarget.decision,
@@ -145,12 +150,14 @@ export const ApprovalsPage: React.FC = () => {
     return true;
   });
 
+  const batchableFiltered = filteredItems.filter((i) => i.item_type !== 'SIMULATION_SCENARIO');
+
   const toggleSelectAll = (checked: boolean) => {
     if (!checked) {
       setSelectedIds({});
     } else {
       const newSel: { [key: string]: boolean } = {};
-      filteredItems.forEach((i) => {
+      batchableFiltered.forEach((i) => {
         newSel[`${i.item_type}-${i.id}`] = true;
       });
       setSelectedIds(newSel);
@@ -201,9 +208,11 @@ export const ApprovalsPage: React.FC = () => {
         </div>
 
         <div className="kpi-card p-4">
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Pending Comp-Offs</div>
-          <div className="text-2xl font-black text-blue-400 mt-1">{stats?.pending_compoffs ?? 0}</div>
-          <div className="text-[11px] text-[#94A3B8] mt-0.5">Earned from overtime/Sunday</div>
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">Pending Comp-Offs / Scenarios</div>
+          <div className="text-2xl font-black text-blue-400 mt-1">
+            {(stats?.pending_compoffs ?? 0)} <span className="text-sm font-bold text-[#2DD4BF]">/ {stats?.pending_scenarios ?? 0} sim</span>
+          </div>
+          <div className="text-[11px] text-[#94A3B8] mt-0.5">Comp-offs & escalated simulator plans</div>
         </div>
 
         <div className="kpi-card p-4">
@@ -263,13 +272,13 @@ export const ApprovalsPage: React.FC = () => {
       {/* Filter Controls */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 glass-card p-4 rounded-2xl border border-[rgba(148,163,184,0.16)]">
         <div className="relative flex-1 max-w-sm">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-[#64748B] absolute left-3.5 top-2.5" />
           <input
             type="text"
-            placeholder="Search employee or justification..."
+            placeholder="Search employee, scenario, or justification..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-slate-50 border border-app-border focus:bg-white focus:ring-1 focus:ring-teal-500"
+            className="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-[#080D12] border border-[rgba(148,163,184,0.22)] text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-[#14B8A6]"
           />
         </div>
 
@@ -278,7 +287,7 @@ export const ApprovalsPage: React.FC = () => {
           <select
             value={selectedPodId}
             onChange={(e) => setSelectedPodId(e.target.value)}
-            className="px-3 py-2 rounded-xl text-xs bg-white border border-app-border text-slate-700 font-medium focus:ring-1 focus:ring-teal-500"
+            className="px-3 py-2 rounded-xl text-xs bg-[#080D12] border border-[rgba(148,163,184,0.22)] text-[#E2E8F0] font-medium focus:outline-none focus:border-[#14B8A6]"
           >
             <option value="ALL">All Operational Pods</option>
             {pods.map((p) => (
@@ -292,49 +301,50 @@ export const ApprovalsPage: React.FC = () => {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value as any)}
-            className="px-3 py-2 rounded-xl text-xs bg-white border border-app-border text-slate-700 font-medium focus:ring-1 focus:ring-teal-500"
+            className="px-3 py-2 rounded-xl text-xs bg-[#080D12] border border-[rgba(148,163,184,0.22)] text-[#E2E8F0] font-medium focus:outline-none focus:border-[#14B8A6]"
           >
             <option value="ALL">All Request Types</option>
             <option value="LEAVE">Leave Requests Only</option>
             <option value="COMPOFF">Comp-Off Credits Only</option>
+            <option value="SIMULATION_SCENARIO">Simulation Scenarios Only</option>
           </select>
         </div>
       </div>
 
       {/* Approvals Table */}
-      <div className="bg-white rounded-enterprise border border-app-border shadow-subtle overflow-hidden">
+      <div className="glass-card rounded-2xl border border-[rgba(148,163,184,0.16)] shadow-subtle overflow-hidden">
         <table className="w-full text-left text-xs">
-          <thead className="bg-slate-50 border-b border-app-border text-slate-500 font-semibold uppercase tracking-wider">
+          <thead className="bg-[#080D12]/80 border-b border-[rgba(148,163,184,0.16)] text-[#94A3B8] font-semibold uppercase tracking-wider">
             <tr>
               {activeTab === 'PENDING' && (
                 <th className="py-3 px-4 w-10 text-center">
                   <input
                     type="checkbox"
-                    checked={filteredItems.length > 0 && selectedCount === filteredItems.length}
+                    checked={batchableFiltered.length > 0 && selectedCount === batchableFiltered.length}
                     onChange={(e) => toggleSelectAll(e.target.checked)}
-                    className="rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                    className="rounded border-[rgba(148,163,184,0.3)] bg-[#080D12] text-[#14B8A6] focus:ring-[#14B8A6]"
                   />
                 </th>
               )}
-              <th className="py-3 px-4">Employee / Pod</th>
+              <th className="py-3 px-4">Employee / Scenario</th>
               <th className="py-3 px-4">Type</th>
               <th className="py-3 px-4">Date Range / Shift</th>
-              <th className="py-3 px-4">Justification</th>
+              <th className="py-3 px-4">Justification & Details</th>
               <th className="py-3 px-4">Status</th>
               {activeTab === 'HISTORY' && <th className="py-3 px-4">Reviewer</th>}
               {activeTab === 'PENDING' && <th className="py-3 px-4 text-right">Decision</th>}
             </tr>
           </thead>
-          <tbody className="divide-y divide-app-border">
+          <tbody className="divide-y divide-[rgba(148,163,184,0.12)]">
             {isLoading ? (
               <tr>
-                <td colSpan={7} className="py-12 text-center text-slate-400">
+                <td colSpan={7} className="py-12 text-center text-[#94A3B8]">
                   Loading approval queue...
                 </td>
               </tr>
             ) : filteredItems.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-12 text-center text-slate-400">
+                <td colSpan={7} className="py-12 text-center text-[#94A3B8]">
                   No requests matching selected filters.
                 </td>
               </tr>
@@ -344,65 +354,91 @@ export const ApprovalsPage: React.FC = () => {
                 const isSelected = !!selectedIds[key];
 
                 return (
-                  <tr key={key} className={`hover:bg-slate-50/80 transition-colors ${isSelected ? 'bg-teal-50/20' : ''}`}>
+                  <tr key={key} className={`hover:bg-[#111820]/60 transition-colors ${isSelected ? 'bg-[#14B8A6]/10' : ''}`}>
                     {activeTab === 'PENDING' && (
                       <td className="py-3 px-4 text-center">
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={(e) => setSelectedIds({ ...selectedIds, [key]: e.target.checked })}
-                          className="rounded border-slate-300 text-teal-600 focus:ring-teal-500"
-                        />
+                        {item.item_type !== 'SIMULATION_SCENARIO' ? (
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => setSelectedIds({ ...selectedIds, [key]: e.target.checked })}
+                            className="rounded border-[rgba(148,163,184,0.3)] bg-[#080D12] text-[#14B8A6] focus:ring-[#14B8A6]"
+                          />
+                        ) : (
+                          <span className="text-[10px] text-[#64748B]" title="Requires individual governance review">•</span>
+                        )}
                       </td>
                     )}
 
                     <td className="py-3 px-4">
-                      <div className="font-bold text-slate-900">{item.employee_name}</div>
-                      <div className="text-[10px] text-slate-400 font-mono">
+                      <div className="font-bold text-[#F8FAFC]">{item.employee_name}</div>
+                      <div className="text-[10px] text-[#94A3B8] font-mono">
                         {item.employee_code} • {item.pod_name}
                       </div>
+                      {item.selected_backup_name && (
+                        <div className="text-[10px] text-[#2DD4BF] mt-0.5 font-semibold">
+                          Selected Backup: {item.selected_backup_name}
+                        </div>
+                      )}
                     </td>
 
                     <td className="py-3 px-4">
                       <span
-                        className={`inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold ${
+                        className={`inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold border ${
                           item.item_type === 'LEAVE'
-                            ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                            : 'bg-blue-50 text-blue-800 border border-blue-200'
+                            ? 'bg-amber-950/40 text-amber-300 border-amber-500/30'
+                            : item.item_type === 'SIMULATION_SCENARIO'
+                            ? 'bg-teal-950/40 text-[#2DD4BF] border-[#14B8A6]/30'
+                            : 'bg-blue-950/40 text-blue-300 border-blue-500/30'
                         }`}
                       >
-                        {item.item_type === 'LEAVE' ? <CalendarCheck className="w-3 h-3 mr-1" /> : <Award className="w-3 h-3 mr-1" />}
+                        {item.item_type === 'LEAVE' ? (
+                          <CalendarCheck className="w-3 h-3 mr-1" />
+                        ) : item.item_type === 'SIMULATION_SCENARIO' ? (
+                          <Sliders className="w-3 h-3 mr-1" />
+                        ) : (
+                          <Award className="w-3 h-3 mr-1" />
+                        )}
                         <span>{item.request_type}</span>
                       </span>
+                      {item.required_approver_role && (
+                        <div className="text-[9px] text-amber-400 mt-1 flex items-center space-x-1">
+                          <ShieldAlert className="w-3 h-3" />
+                          <span>Role: {item.required_approver_role}</span>
+                        </div>
+                      )}
                     </td>
 
-                    <td className="py-3 px-4 font-mono text-[11px] text-slate-800">
+                    <td className="py-3 px-4 font-mono text-[11px] text-[#CBD5E1]">
                       {item.date_range}
                     </td>
 
-                    <td className="py-3 px-4 text-slate-600 max-w-xs truncate">
-                      {item.reason}
+                    <td className="py-3 px-4 text-[#CBD5E1] max-w-xs">
+                      <div className="truncate">{item.reason}</div>
+                      {item.impact_summary_note && (
+                        <div className="text-[10px] text-[#94A3B8] truncate mt-0.5">{item.impact_summary_note}</div>
+                      )}
                     </td>
 
                     <td className="py-3 px-4">
                       <span
                         className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                           item.status === 'APPROVED'
-                            ? 'bg-emerald-100 text-emerald-800'
+                            ? 'bg-emerald-950/50 text-emerald-300 border border-emerald-500/30'
                             : item.status === 'PENDING'
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-rose-100 text-rose-800'
+                            ? 'bg-amber-950/50 text-amber-300 border border-amber-500/30'
+                            : 'bg-rose-950/50 text-rose-300 border border-rose-500/30'
                         }`}
                       >
-                        {item.status}
+                        {item.scenario_status || item.status}
                       </span>
                     </td>
 
                     {activeTab === 'HISTORY' && (
-                      <td className="py-3 px-4 text-slate-600 text-[11px]">
+                      <td className="py-3 px-4 text-[#CBD5E1] text-[11px]">
                         <div>{item.reviewed_by_name || 'System Admin'}</div>
                         {item.review_comments && (
-                          <div className="text-[10px] text-slate-400 italic">"{item.review_comments}"</div>
+                          <div className="text-[10px] text-[#94A3B8] italic">"{item.review_comments}"</div>
                         )}
                       </td>
                     )}
@@ -412,14 +448,14 @@ export const ApprovalsPage: React.FC = () => {
                         <div className="inline-flex items-center space-x-1.5">
                           <button
                             onClick={() => setReviewTarget({ item, decision: 'APPROVED' })}
-                            className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors"
+                            className="p-1.5 rounded-lg bg-emerald-950/50 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-900/60 transition-colors"
                             title="Approve Request"
                           >
                             <Check className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setReviewTarget({ item, decision: 'REJECTED' })}
-                            className="p-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 transition-colors"
+                            className="p-1.5 rounded-lg bg-rose-950/50 text-rose-400 border border-rose-500/30 hover:bg-rose-900/60 transition-colors"
                             title="Reject Request"
                           >
                             <X className="w-4 h-4" />

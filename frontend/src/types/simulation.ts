@@ -9,7 +9,14 @@ export type SimulationType =
   | 'BRAND_RULE_CHANGE'
   | 'PROCESS_STAFFING_CHANGE';
 
-export type ScenarioStatus = 'DRAFT' | 'SAVED' | 'APPLIED' | 'DISCARDED';
+export type ScenarioStatus =
+  | 'DRAFT'
+  | 'SAVED'
+  | 'PENDING_APPROVAL'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'APPLIED'
+  | 'DISCARDED';
 
 export interface SimulationRequest {
   roster_id: number;
@@ -23,6 +30,7 @@ export interface SimulationRequest {
   new_rule_type?: string;
   new_min_headcount?: number;
   reason?: string;
+  expected_snapshot_hash?: string;
 }
 
 export interface AffectedEmployee {
@@ -68,6 +76,37 @@ export interface SimulatedConflict {
   description: string;
 }
 
+export interface ScoreBreakdown {
+  skill_score: number;
+  availability_score: number;
+  pod_score: number;
+  workload_score: number;
+  certification_score: number;
+}
+
+export interface ExclusionReasonSummary {
+  code: string;
+  label: string;
+  count: number;
+  description: string;
+  employee_names: string[];
+}
+
+export interface BackupEvaluationSummary {
+  total_evaluated: number;
+  eligible_count: number;
+  excluded_count: number;
+  target_brand_id?: number | null;
+  target_brand_name?: string | null;
+  target_process_id?: number | null;
+  target_process_name?: string | null;
+  required_shift: string;
+  required_skills: string[];
+  mandatory_certifications: string[];
+  evaluated_dates: string[];
+  exclusion_reasons: ExclusionReasonSummary[];
+}
+
 export interface BackupCandidate {
   employee_id: number;
   employee_code: string;
@@ -76,9 +115,23 @@ export interface BackupCandidate {
   pod_name: string;
   designation: string;
   current_status: ShiftStatus;
+  available_shift?: string;
+  pod_proximity?: string;
   suitability_score: number;
-  match_reasons: string[];
+  score_breakdown?: ScoreBreakdown | null;
+  skill_match_pct?: number;
+  matched_skills?: string[];
+  certification_status?: string;
+  certifications?: string[];
+  current_weekly_hours?: number;
+  projected_weekly_hours?: number;
+  max_weekly_hours?: number;
+  consecutive_days_before?: number;
   consecutive_days_after: number;
+  max_consecutive_days?: number;
+  min_rest_hours_gap?: number | null;
+  match_reasons: string[];
+  recommendation_summary?: string | null;
   is_labor_compliant: boolean;
   requires_comp_off: boolean;
 }
@@ -102,6 +155,10 @@ export interface SimulationResultResponse {
   affected_dates: string[];
   cascading_effects: string[];
   backup_recommendations: BackupCandidate[];
+  backup_evaluation_summary?: BackupEvaluationSummary | null;
+  roster_snapshot_hash?: string | null;
+  requires_approval?: boolean;
+  required_approver_role?: string | null;
   can_absorb_without_replacement: boolean;
   absorption_explanation?: string | null;
   executive_summary: string;
@@ -115,6 +172,10 @@ export interface SaveScenarioRequest {
   simulation_type: SimulationType;
   parameters: Record<string, any>;
   impact_summary: Record<string, any>;
+  candidate_ranking?: Record<string, any> | null;
+  selected_backup_employee_id?: number | null;
+  roster_snapshot_hash?: string | null;
+  submit_for_approval?: boolean;
 }
 
 export interface ScenarioResponse {
@@ -126,7 +187,17 @@ export interface ScenarioResponse {
   status: ScenarioStatus;
   parameters: Record<string, any>;
   impact_summary: Record<string, any>;
+  candidate_ranking?: Record<string, any> | null;
+  selected_backup_employee_id?: number | null;
+  selected_backup_employee_name?: string | null;
+  roster_snapshot_hash?: string | null;
+  requires_approval?: boolean;
+  required_approver_role?: string | null;
   created_by_name?: string | null;
+  reviewed_by_name?: string | null;
+  review_comments?: string | null;
+  reviewed_at?: string | null;
+  applied_by_name?: string | null;
   created_at: string;
   applied_at?: string | null;
 }
@@ -134,6 +205,8 @@ export interface ScenarioResponse {
 export interface ApplyScenarioRequest {
   scenario_id?: number;
   replacement_employee_id?: number;
+  selected_backup_employee_id?: number;
+  expected_snapshot_hash?: string;
   simulation_params?: Record<string, any>;
   override_reason?: string;
   notes?: string;
@@ -147,5 +220,7 @@ export interface ApplyScenarioResponse {
   new_coverage_pct: number;
   remaining_conflicts_count: number;
   audit_log_id: number;
+  applied_by_user_id?: number | null;
+  applied_by_name?: string | null;
   applied_at: string;
 }

@@ -18,6 +18,7 @@ from app.models.conflict import SchedulingConflict, ConflictType, ConflictSeveri
 from app.models.audit import AuditLog
 from app.models.notification import Notification
 from app.models.simulation import SimulationScenario, SimulationType, ScenarioStatus
+from app.models.animation_controller import AnimationControllerConfig
 
 __all__ = [
     "Base",
@@ -51,4 +52,5 @@ __all__ = [
     "SimulationScenario",
     "SimulationType",
     "ScenarioStatus",
+    "AnimationControllerConfig",
 ]

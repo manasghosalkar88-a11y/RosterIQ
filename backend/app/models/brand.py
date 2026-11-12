@@ -12,6 +12,7 @@ class Brand(Base, TimestampMixin):
     name = Column(String(255), nullable=False)                         # e.g., "Alpha Organics"
     client_name = Column(String(255), nullable=True)                   # Client corporate entity
     pod_id = Column(Integer, ForeignKey("pods.id", ondelete="SET NULL"), nullable=True)
+    allow_cross_pod_backup = Column(Boolean, default=True, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     notes = Column(String(500), nullable=True)
 

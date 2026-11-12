@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const rawBaseUrl =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  'http://localhost:8000/api/v1';
+
+const API_BASE_URL = rawBaseUrl.replace(/\/+$/, '');
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -25,11 +30,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Auto-clear invalid token
+    const requestUrl = error.config?.url || '';
+    const isLoginRequest = requestUrl.includes('/auth/login');
+    if (error.response && error.response.status === 401 && !isLoginRequest) {
+      // Auto-clear invalid/expired token for authenticated requests
       localStorage.removeItem('rosteriq_token');
       localStorage.removeItem('rosteriq_user');
-      // If not already on login, dispatch custom event or allow AuthContext to handle
       window.dispatchEvent(new Event('auth:unauthorized'));
     }
     return Promise.reject(error);

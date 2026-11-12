@@ -3,11 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import PaperCrumple from '../components/reactbits/PaperCrumple';
 import {
   Shield,
-  Sparkles,
   AlertCircle,
   ArrowRight,
   ArrowLeft,
-  CheckCircle2,
   Lock,
   Mail,
   HelpCircle,
@@ -18,13 +16,12 @@ export interface LoginProps {
 }
 
 export const Login: React.FC<LoginProps> = ({ onBackToLanding }) => {
-  const { login, seedUsers } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [seedNotice, setSeedNotice] = useState<string | null>(null);
   const [forgotNotice, setForgotNotice] = useState<string | null>(null);
   const [introStage, setIntroStage] = useState<'crumpled' | 'unfolding' | 'revealed'>('crumpled');
 
@@ -55,26 +52,10 @@ export const Login: React.FC<LoginProps> = ({ onBackToLanding }) => {
       await login(email.trim(), password);
     } catch (err: any) {
       const message =
-        err.response?.data?.detail || 'Authentication failed. Please verify credentials or sync demo accounts.';
+        err.response?.data?.detail || 'Authentication failed. Please verify your work email and password.';
       setError(message);
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleQuickFill = (demoEmail: string, demoPass: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    setError(null);
-  };
-
-  const handleSeedDemoAccounts = async () => {
-    try {
-      await seedUsers();
-      setSeedNotice('4 demo accounts (Super Admin, Ops Mgr, Lead, Employee) synchronized in database!');
-      setTimeout(() => setSeedNotice(null), 5000);
-    } catch (err) {
-      setError('Failed to sync demo accounts. Ensure FastAPI backend is running on port 8000.');
     }
   };
 
@@ -108,7 +89,7 @@ export const Login: React.FC<LoginProps> = ({ onBackToLanding }) => {
       </header>
 
       {/* Main Full-Screen Paper & Glass Stage */}
-      <main className="relative w-full max-w-[1020px] h-[700px] sm:h-[720px] max-h-[85vh] my-auto flex items-center justify-center">
+      <main className="relative w-full max-w-[1020px] min-h-[540px] h-[640px] sm:h-[680px] max-h-[84vh] my-auto flex items-center justify-center">
         {/* Layer 1: 3D PaperCrumple Canvas */}
         <div className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing">
           <PaperCrumple
@@ -166,27 +147,37 @@ export const Login: React.FC<LoginProps> = ({ onBackToLanding }) => {
 
         {/* Layer 2: Dark Glassmorphic Login Card */}
         <div
-          className={`absolute inset-0 flex items-center justify-center pointer-events-none z-20 transition-all duration-700 ease-out px-4 ${
+          className={`absolute inset-0 flex items-center justify-center pointer-events-none z-20 transition-all duration-700 ease-out px-4 sm:px-6 ${
             introStage === 'revealed'
               ? 'opacity-100 scale-100'
               : 'opacity-0 scale-95 pointer-events-none'
           }`}
         >
-          <div className="w-full max-w-[460px] bg-[rgba(23,28,34,0.92)] backdrop-blur-[18px] border border-white/12 rounded-2xl shadow-[0_16px_36px_-4px_rgba(0,0,0,0.7),0_6px_12px_-2px_rgba(0,0,0,0.5)] p-6 sm:p-7 pointer-events-auto select-auto">
-            {onBackToLanding && (
-              <button
-                type="button"
-                onClick={onBackToLanding}
-                className="mb-4 text-xs font-medium text-[#94A3B8] hover:text-[#2DD4BF] flex items-center space-x-1.5 transition-colors group"
+          <div className="w-full max-w-[440px] bg-[rgba(23,28,34,0.92)] backdrop-blur-[18px] border border-white/12 rounded-2xl shadow-[0_16px_36px_-4px_rgba(0,0,0,0.7),0_6px_12px_-2px_rgba(0,0,0,0.5)] p-6 sm:p-8 pointer-events-auto select-auto">
+            <div className="mb-5">
+              <a
+                href="#/landing"
+                aria-label="Back to Platform Overview"
+                onClick={(e) => {
+                  if (!e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+                    e.preventDefault();
+                    if (onBackToLanding) {
+                      onBackToLanding();
+                    } else {
+                      window.location.hash = '#/landing';
+                    }
+                  }
+                }}
+                className="inline-flex items-center space-x-1.5 px-2 py-1 -ml-2 rounded-lg text-xs font-medium text-[#94A3B8] hover:text-[#2DD4BF] hover:bg-white/[0.04] cursor-pointer transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14B8A6]/60 group"
               >
-                <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+                <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-1" />
                 <span>Back to Platform Overview</span>
-              </button>
-            )}
+              </a>
+            </div>
 
             {/* Form Header */}
-            <div className="text-center mb-5">
-              <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-[#397C70] text-white font-bold text-xl shadow-md shadow-teal-500/25 border border-white/10 mb-2">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#397C70] text-white font-bold text-xl shadow-md shadow-teal-500/25 border border-white/10 mb-3">
                 R
               </div>
               <div className="flex items-center justify-center space-x-2">
@@ -197,23 +188,16 @@ export const Login: React.FC<LoginProps> = ({ onBackToLanding }) => {
                   Enterprise v2.4
                 </span>
               </div>
-              <p className="text-xs text-[#A0AAB5] mt-1 leading-relaxed">
+              <p className="text-xs text-[#A0AAB5] mt-1.5 leading-relaxed">
                 Smart Roster Management & Operations Matrix
               </p>
             </div>
 
-            {/* Error & Success Alerts */}
+            {/* Error & Notification Alerts */}
             {error && (
               <div className="mb-4 p-3 rounded-xl bg-[#D45D63]/15 border border-[#D45D63]/30 text-[#FCA5A5] text-xs font-medium flex items-start space-x-2 animate-in fade-in duration-200">
                 <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-[#F87171]" />
                 <span className="leading-snug">{error}</span>
-              </div>
-            )}
-
-            {seedNotice && (
-              <div className="mb-4 p-3 rounded-xl bg-[#397C70]/15 border border-[#397C70]/30 text-teal-300 text-xs font-medium flex items-start space-x-2 animate-in fade-in duration-200">
-                <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 text-teal-400" />
-                <span className="leading-snug">{seedNotice}</span>
               </div>
             )}
 
@@ -225,14 +209,14 @@ export const Login: React.FC<LoginProps> = ({ onBackToLanding }) => {
             )}
 
             {/* Login Form */}
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-[11px] font-bold text-[#A0AAB5] uppercase tracking-wider mb-1">
+                <label className="block text-[11px] font-bold text-[#A0AAB5] uppercase tracking-wider mb-1.5">
                   Work Email
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-                    <Mail className="w-3.5 h-3.5" />
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
+                    <Mail className="w-4 h-4" />
                   </div>
                   <input
                     type="email"
@@ -240,18 +224,18 @@ export const Login: React.FC<LoginProps> = ({ onBackToLanding }) => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@datastraw.io"
                     required
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-[#0B0E12] border border-white/10 text-[#F5F7FA] placeholder-[#727E89] text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#397C70] focus:border-transparent transition-all shadow-neumorph-inset"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#0B0E12] border border-white/10 text-[#F5F7FA] placeholder-[#727E89] text-sm focus:outline-none focus:ring-2 focus:ring-[#397C70] focus:border-transparent transition-all shadow-neumorph-inset"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-[#A0AAB5] uppercase tracking-wider mb-1">
+                <label className="block text-[11px] font-bold text-[#A0AAB5] uppercase tracking-wider mb-1.5">
                   Password
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-                    <Lock className="w-3.5 h-3.5" />
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500">
+                    <Lock className="w-4 h-4" />
                   </div>
                   <input
                     type="password"
@@ -259,13 +243,13 @@ export const Login: React.FC<LoginProps> = ({ onBackToLanding }) => {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
                     required
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl bg-[#0B0E12] border border-white/10 text-[#F5F7FA] placeholder-[#727E89] text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#397C70] focus:border-transparent transition-all shadow-neumorph-inset"
+                    className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#0B0E12] border border-white/10 text-[#F5F7FA] placeholder-[#727E89] text-sm focus:outline-none focus:ring-2 focus:ring-[#397C70] focus:border-transparent transition-all shadow-neumorph-inset"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-[11px] pt-0.5">
-                <label className="flex items-center space-x-1.5 cursor-pointer text-[#A0AAB5] hover:text-white transition-colors">
+              <div className="flex items-center justify-between text-xs pt-0.5">
+                <label className="flex items-center space-x-2 cursor-pointer text-[#A0AAB5] hover:text-white transition-colors">
                   <input
                     type="checkbox"
                     checked={rememberMe}
@@ -278,10 +262,12 @@ export const Login: React.FC<LoginProps> = ({ onBackToLanding }) => {
                 <button
                   type="button"
                   onClick={() => {
-                    setForgotNotice('For evaluation, click any of the 1-click Quick Logins below.');
+                    setForgotNotice(
+                      'Password resets are managed by your Workspace Administrator. Check your corporate email for issued credentials or contact IT Support.'
+                    );
                     setTimeout(() => setForgotNotice(null), 6000);
                   }}
-                  className="font-medium text-teal-400 hover:text-teal-300 hover:underline transition-colors"
+                  className="font-medium text-teal-400 hover:text-teal-300 hover:underline transition-colors cursor-pointer"
                 >
                   Forgot password?
                 </button>
@@ -290,88 +276,19 @@ export const Login: React.FC<LoginProps> = ({ onBackToLanding }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2.5 px-4 rounded-xl font-bold text-xs uppercase tracking-wider bg-[#397C70] hover:bg-[#2D6359] text-white shadow-neumorph-btn flex items-center justify-center space-x-2 transition-all disabled:opacity-50 cursor-pointer active:translate-y-0.5"
+                className="w-full py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider bg-[#397C70] hover:bg-[#2D6359] text-white shadow-neumorph-btn flex items-center justify-center space-x-2 transition-all disabled:opacity-50 cursor-pointer active:translate-y-0.5 mt-1"
               >
                 <span>{isSubmitting ? 'Authenticating...' : 'Sign In to Workspace'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-4 h-4" />
               </button>
             </form>
 
-            {/* Assessment Quick Logins */}
-            <div className="mt-4 pt-3.5 border-t border-white/10">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold text-[#A0AAB5] uppercase tracking-wider flex items-center space-x-1">
-                  <Sparkles className="w-3 h-3 text-teal-400" />
-                  <span>Assessment Quick Logins</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={handleSeedDemoAccounts}
-                  className="text-[10px] text-teal-400 hover:underline font-semibold"
-                >
-                  Sync Accounts
-                </button>
-              </div>
-
-              <div className="grid grid-cols-2 gap-1.5 text-xs">
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill('admin@datastraw.io', 'Admin@123')}
-                  className="p-2 rounded-xl bg-[#0B0E12]/80 hover:bg-[#15191E] border border-white/10 text-left transition-colors flex items-center space-x-2 group cursor-pointer"
-                >
-                  <div className="w-2 h-2 rounded-full bg-purple-400 flex-shrink-0 shadow-sm shadow-purple-400/50" />
-                  <div className="truncate">
-                    <div className="font-bold text-[11px] text-white group-hover:text-purple-300 transition-colors truncate">
-                      Super Admin
-                    </div>
-                    <div className="text-[9px] text-[#A0AAB5] font-mono truncate">admin@datastraw.io</div>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill('ops@datastraw.io', 'Ops@123')}
-                  className="p-2 rounded-xl bg-[#0B0E12]/80 hover:bg-[#15191E] border border-white/10 text-left transition-colors flex items-center space-x-2 group cursor-pointer"
-                >
-                  <div className="w-2 h-2 rounded-full bg-teal-400 flex-shrink-0 shadow-sm shadow-teal-400/50" />
-                  <div className="truncate">
-                    <div className="font-bold text-[11px] text-white group-hover:text-teal-300 transition-colors truncate">
-                      Ops Manager
-                    </div>
-                    <div className="text-[9px] text-[#A0AAB5] font-mono truncate">ops@datastraw.io</div>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill('lead@datastraw.io', 'Lead@123')}
-                  className="p-2 rounded-xl bg-[#0B0E12]/80 hover:bg-[#15191E] border border-white/10 text-left transition-colors flex items-center space-x-2 group cursor-pointer"
-                >
-                  <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0 shadow-sm shadow-amber-400/50" />
-                  <div className="truncate">
-                    <div className="font-bold text-[11px] text-white group-hover:text-amber-300 transition-colors truncate">
-                      Pod Lead
-                    </div>
-                    <div className="text-[9px] text-[#A0AAB5] font-mono truncate">lead@datastraw.io</div>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleQuickFill('emp@datastraw.io', 'Emp@123')}
-                  className="p-2 rounded-xl bg-[#0B0E12]/80 hover:bg-[#15191E] border border-white/10 text-left transition-colors flex items-center space-x-2 group cursor-pointer"
-                >
-                  <div className="w-2 h-2 rounded-full bg-sky-400 flex-shrink-0 shadow-sm shadow-sky-400/50" />
-                  <div className="truncate">
-                    <div className="font-bold text-[11px] text-white group-hover:text-sky-300 transition-colors truncate">
-                      Employee
-                    </div>
-                    <div className="text-[9px] text-[#A0AAB5] font-mono truncate">emp@datastraw.io</div>
-                  </div>
-                </button>
-              </div>
-
-              <p className="text-[10px] text-[#727E89] mt-2.5 flex items-center justify-center space-x-1.5 font-mono">
+            {/* Enterprise Security & Compliance Footer */}
+            <div className="mt-6 pt-4 border-t border-white/10 text-center space-y-1.5">
+              <p className="text-[11px] text-[#94A3B8]">
+                Authorized access only • Credentials are provisioned privately via work email
+              </p>
+              <p className="text-[10px] text-[#727E89] flex items-center justify-center space-x-1.5 font-mono">
                 <Shield className="w-3 h-3 text-teal-400" />
                 <span>SOC2 Type II • ISO 27001 • 256-bit AES</span>
               </p>
