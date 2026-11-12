@@ -65,19 +65,31 @@ def ensure_schema_columns() -> None:
                 continue
             existing_cols = {c["name"]
                              for c in inspector.get_columns(table_name)}
+            
             for col_name, col_def in cols:
-                if col_name not in existing_cols:
-                    pg_def = col_def
+                    if col_name not in existing_cols:
+                        pg_def = col_def
 
-                if engine.dialect.name == "postgresql":
-                    pg_def = (
-                        pg_def
-                        .replace("BOOLEAN NOT NULL DEFAULT 1", "BOOLEAN NOT NULL DEFAULT TRUE")
-                        .replace("BOOLEAN NOT NULL DEFAULT 0", "BOOLEAN NOT NULL DEFAULT FALSE")
-                        .replace("DATETIME", "TIMESTAMP")
+                        if engine.dialect.name == "postgresql":
+                            pg_def = (
+                                pg_def
+                                .replace(
+                                    "BOOLEAN NOT NULL DEFAULT 1",
+                                    "BOOLEAN NOT NULL DEFAULT TRUE"
+                                )
+                                .replace(
+                                    "BOOLEAN NOT NULL DEFAULT 0",
+                                    "BOOLEAN NOT NULL DEFAULT FALSE"
+                                )
+                                .replace("DATETIME", "TIMESTAMP")
+                            )
+
+                        conn.execute(
+                            text(
+                                f"ALTER TABLE {table_name} ADD COLUMN {col_name} {pg_def}"
+                            )
                     )
-                    conn.execute(
-                        text(f"ALTER TABLE {table_name} ADD COLUMN {col_name} {pg_def}"))
+
 
         if engine.dialect.name == "postgresql" and "simulation_scenarios" in existing_tables:
             for val in ("PENDING_APPROVAL", "APPROVED", "REJECTED"):
